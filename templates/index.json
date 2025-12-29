@@ -1,0 +1,6 @@
+{
+  "sections": {
+    "best_sellers": { "type": "best-sellers" }
+  },
+  "order": ["best_sellers"]
+}
