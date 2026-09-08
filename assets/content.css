@@ -1,0 +1,202 @@
+/* ==========================================================================
+   PAGE (CONTENT LAYER)
+   ========================================================================== */
+
+/* PAGE intro */
+.page-intro {
+  max-width: 720px;
+  margin-block-end: var(--space-lg);
+  text-align: center;
+}
+
+.page-intro h1 {
+  margin-block-end: var(--space-sm);
+  font-size: var(--hero-title);
+}
+
+/* PAGE CONTAINER */
+.page-container {
+  max-width: var(--content-width-normal);
+  margin-inline: auto;
+  padding-inline: var(--page-margin);
+}
+
+/* PAGE BLOCKS */
+.page-block {
+  margin-block-end: var(--space-lg);
+}
+
+.page-block h2 {
+  margin-block-end: var(--space-sm);
+  font-size: var(--heading-sm);
+  color: var(--color-text-primary);
+}
+
+.page-block p {
+  margin-block-end: var(--space-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
+.page-block ul {
+  margin-block: var(--space-sm);
+  padding-inline-start: var(--space-lg);
+  list-style: disc;
+  color: var(--color-text-secondary);
+}
+
+.page-block li {
+  margin-block-end: var(--space-xs);
+}
+
+/* PAGE GRID */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+  align-items: start;
+}
+
+/* PAGE CARD */
+.page-card {
+  height: 100%;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* ==========================================================================
+   BUILDER (STRUCTURE LAYER)
+   ========================================================================== */
+
+.builder--align-center {
+  text-align: center;
+}
+
+.builder--align-left {
+  text-align: left;
+}
+
+/* BUILDER INTRO */
+.builder__hero {
+  display: flex;
+  flex-direction: column;
+  margin-block-end: var(--space-lg);
+}
+
+.builder--align-center .builder__hero {
+  align-items: center;
+}
+
+.builder--align-left .builder__hero {
+  align-items: flex-start;
+}
+
+.builder__title {
+  font-size: var(--hero-title);
+}
+
+.builder__subtitle {
+  font-size: var(--subtitle);
+  max-width: 640px;
+}
+
+/* MEDIA */
+.builder__media {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.builder__media img {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+/* FEATURES */
+.builder__features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.builder__feature {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.builder__feature-title {
+  margin-block-end: var(--space-xs);
+}
+
+/* ==========================================================================
+   PRODUCT 
+   ========================================================================== */
+.product-grid {
+  gap: var(--space-lg);
+  padding-block-start: var(--space-lg);
+}
+
+.product__title {
+  font-size: var(--heading-lg);
+  margin-block-end: var(--space-sm);
+}
+
+.product__price {
+  margin-block-end: var(--space-md);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.price-item--old {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.product__quantity input {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  width: 80px;
+  margin-block-start: var(--space-xs);
+}
+
+.product__submit {
+  margin-block-start: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.variant span {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-block;
+  transition: var(--transition-fast);
+}
+
+.variant input:checked + span {
+  background: var(--color-surface-inverse);
+  color: var(--color-background);
+  border-color: var(--color-surface-inverse);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .page-intro {
+    margin-block-end: var(--space-md);
+  }
+}

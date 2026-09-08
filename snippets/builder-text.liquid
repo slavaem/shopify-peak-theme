@@ -1,0 +1,75 @@
+{% doc %}
+  Builder Text
+
+  Renders rich text content with styled lists, images, and links.
+
+  Usage:
+    {% render 'builder-text', block: block %}
+
+  Example Block Schema (Скопируй этот JSON в schema нужной секции в массив "blocks"):
+  {
+    "type": "text",
+    "name": "Text",
+    "settings": [
+      {
+        "type": "richtext",
+        "id": "content",
+        "label": "Text content",
+        "default": "<p>Share information about your brand with your customers.</p>"
+      }
+    ]
+  }
+{% enddoc %}
+
+{% if block.settings.content != blank %}
+  <div class="builder__text">
+    {{ block.settings.content }}
+  </div>
+{% endif %}
+
+{% style %}
+.builder__text {
+  font-family: var(--font-family-body);
+  font-size: var(--text-body, var(--font-size-base));
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.builder__text > *:first-child {
+  margin-top: 0;
+}
+
+.builder__text > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Links */
+.builder__text a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  transition: opacity var(--transition-fast);
+}
+
+.builder__text a:hover {
+  opacity: 0.8;
+}
+
+/* Images */
+.builder__text img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+/* Lists */
+.builder__text ul,
+.builder__text ol {
+  padding-inline-start: var(--space-lg);
+  margin-block: var(--space-sm);
+}
+
+.builder__text li {
+  margin-block-end: var(--space-xs);
+}
+{% endstyle %}

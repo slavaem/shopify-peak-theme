@@ -1,0 +1,118 @@
+.cart-notification {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--page-margin);
+  z-index: 1000;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  width: 320px;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  pointer-events: none;
+  left: auto;
+}
+
+.cart-notification a,
+.cart-notification button {
+  pointer-events: auto;
+}
+
+.cart-notification[open] {
+  animation: notification-in var(--transition-base, 0.3s) ease;
+}
+
+.cart-notification__inner {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  position: relative;
+}
+
+.cart-notification__image {
+  inline-size: var(--control-size-lg);
+  block-size: var(--control-size-lg);
+  flex-shrink: 0;
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cart-notification__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-notification__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding-inline-end: var(--space-md);
+}
+
+.cart-notification__text {
+  font-size: var(--text-small);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  margin-block-end: 0;
+}
+
+.cart-notification__text strong {
+  font-family: var(--font-family-heading);
+  display: block;
+  color: var(--color-text-primary);
+  margin-block: var(--space-2xs);
+}
+
+.cart-notification__meta {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.cart-notification__link {
+  font-size: var(--text-small);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+}
+
+.cart-notification__link:hover {
+  color: var(--color-text-primary);
+}
+
+.cart-notification__close {
+  position: absolute;
+  top: var(--space-2xs);
+  right: var(--space-2xs);
+  width: var(--control-size-sm);
+  height: var(--control-size-sm);
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.cart-notification__close:hover {
+  color: var(--color-text-primary);
+}
+
+@keyframes notification-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

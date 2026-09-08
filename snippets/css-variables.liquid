@@ -1,18 +1,121 @@
 {% style %}
-  {% # Loads all font variantions with display: swap %}
+  /* =========================
+     FONTS (Primary & Secondary)
+  ========================= */
   {{ settings.type_primary_font | font_face: font_display: 'swap' }}
   {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
   {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
 
+  {{ settings.type_secondary_font | font_face: font_display: 'swap' }}
+  {{ settings.type_secondary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+
   :root {
+    /* =========================
+       TYPOGRAPHY (Primary Font)
+    ========================= */
     --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
     --font-primary--style: {{ settings.type_primary_font.style }};
     --font-primary--weight: {{ settings.type_primary_font.weight }};
-    --page-width: {{ settings.max_page_width }};
-    --page-margin: {{ settings.min_page_margin }}px;
+
+    /* TYPOGRAPHY (Secondary Font) */
+    --font-secondary--family: {{ settings.type_secondary_font.family }}, {{ settings.type_secondary_font.fallback_families }};
+    --font-secondary--style: {{ settings.type_secondary_font.style }};
+    --font-secondary--weight: {{ settings.type_secondary_font.weight }};
+
+    --heading-base: {{ settings.heading_base_size | default: 28 }}px;
+    --heading-scale: {{ settings.heading_scale | default: 1.2 }};
+
+    /* =========================
+       RADIUS 
+    ========================= */
+    --radius-base: {{ settings.radius_base | default: 12 }}px;
+
+    /* =========================
+       LAYOUT 
+    ========================= */
+    --page-width: {{ settings.max_page_width | default: '1200px' }};
+    --page-margin: {{ settings.min_page_margin | default: 20 }}px;
+    --content-width-narrow: calc(var(--page-width) * 0.55);
+    --content-width-normal: var(--page-width);
+    --content-width-wide: calc(var(--page-width) * 1.2);
+    --content-width-full: 100%;
+
+    /* =========================
+       COLORS and BACKGROUND
+    ========================= */
+
+         {% if settings.site_background_image != blank %}
+         {% if settings.site_background_image.src contains '.svg' %}
+            --site-background-image: url({{ settings.site_background_image | image_url }});
+         {% else %}
+            --site-background-image: url({{ settings.site_background_image | image_url: width: 2000 }});
+         {% endif %}
+         --site-background-size: {{ settings.site_background_size }};
+         --site-background-repeat: {% if settings.site_background_size == 'auto' %}repeat{% else %}no-repeat{% endif %};
+         --site-background-attachment: {% if settings.site_background_size == 'cover' %}fixed{% else %}scroll{% endif %};
+      {% else %}
+         --site-background-image: none;
+         --site-background-size: cover;
+         --site-background-repeat: no-repeat;
+         --site-background-attachment: fixed;
+      {% endif %}
+
+      /* Isolated Layer Effects (body::before tokens) */
+      {% if settings.site_background_image != blank or settings.site_background_video != blank %}
+            --site-background-overlay: rgb(
+            {{ settings.site_background_overlay_color.rgb }} / {{ settings.site_background_overlay | divided_by: 100.0 | default: 0 }}
+            );
+         {% if settings.site_background_blur > 0 %}
+            --site-background-blur: blur({{ settings.site_background_blur }}px);
+         {% else %}
+            --site-background-blur: none;
+         {% endif %}
+      {% else %}
+         --site-background-overlay: transparent;
+         --site-background-blur: none;
+      {% endif %}
+
     --color-background: {{ settings.background_color }};
     --color-foreground: {{ settings.foreground_color }};
-    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+    --color-accent: {{ settings.accent_color }};
+
+    --color-surface: {{ settings.surface_color }};
+    --color-surface-subtle: {{ settings.surface_subtle_color }};
+    --color-surface-hover: {{ settings.surface_hover_color }};
+
+    --color-border: {{ settings.border_color }};
+
+    --color-text-secondary: {{ settings.text_secondary_color }};
+    --color-text-muted: {{ settings.text_muted_color }};
+
+    --color-success: {{ settings.success_color }};
+    --color-danger: {{ settings.danger_color }};
+    --color-rating: {{ settings.rating_color }};
+
+    /* =========================
+       SPACING SCALE
+    ========================= */
+    --space-unit: {{ settings.spacing_base | default: 8 }}px;
+
+    /* =========================
+       PRODUCT CARD
+    ========================= */
+    --card-bg: {{ settings.card_bg_color | default: settings.background_color }};
+    --card-title-size: {{ settings.card_title_size | default: 16 }}px;
+    --card-price-size: {{ settings.card_price_size | default: 18 }}px;
+
+    --card-padding: {{ settings.card_padding }}px;
+
+    --card-text-align: {{ settings.card_text_alignment }};
+   {% if settings.card_text_alignment == 'center' %}
+   --card-flex-align: center;
+   {% else %}
+   --card-flex-align: flex-start;
+   {% endif %}
+
+    /* Image settings */
+    --card-image-ratio: {{ settings.image_ratio | default: '1/1' }};
+    --card-image-fit: {{ settings.image_fit | default: 'cover' }};
+    --card-shadow-opacity: {{ settings.card_shadow_opacity | divided_by: 100.0 | default: 0.1 }};
   }
 {% endstyle %}

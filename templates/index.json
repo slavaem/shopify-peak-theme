@@ -1,6 +1,53 @@
 {
   "sections": {
-    "best_sellers": { "type": "best-sellers" }
+    "video-hero": { "type": "video-hero" },
+    "usp": {
+      "type": "usp-section",
+      "blocks": {
+        "shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "🚚",
+            "title_key": "sections.usp.free_shipping_title"
+          }
+        },
+        "returns": {
+          "type": "item",
+          "settings": {
+            "icon": "🔄",
+            "title_key": "sections.usp.easy_returns_title"
+          }
+        },
+        "payment": {
+          "type": "item",
+          "settings": {
+            "icon": "🔒",
+            "title_key": "sections.usp.secure_payment_title"
+          }
+        },
+        "support": {
+          "type": "item",
+          "settings": {
+            "icon": "💬",
+            "title_key": "sections.usp.support_title"
+          }
+        }
+      },
+      "block_order": ["shipping", "returns", "payment", "support"]
+    },
+    "best-sellers": { "type": "best-sellers" },
+    "masonry": { "type": "masonry-gallery" },
+    "slider": { "type": "product-slider" },
+    "reviews": { "type": "reviews" },
+    "newsletter": { "type": "newsletter" }
   },
-  "order": ["best_sellers"]
+  "order": [
+    "video-hero",
+    "usp",
+    "best-sellers",
+    "masonry",
+    "slider",
+    "reviews",
+    "newsletter"
+  ]
 }

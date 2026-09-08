@@ -1,0 +1,214 @@
+{
+  "general": {
+    "header": "Header",
+    "continue_shopping": "Continue shopping",
+    "cancel": "Cancel"
+  },
+  "404": {
+    "title": "404",
+    "not_found": "Page not found.",
+    "back_to_shopping": "Back to shopping"
+  },
+  "blog": {
+    "article_comments": "Comments",
+    "article_metadata_html": "{{ date }} by {{ author }}",
+    "comment_form_body": "Comment",
+    "comment_form_email": "Email",
+    "comment_form_name": "Name",
+    "comment_form_submit": "Post",
+    "comment_form_title": "Add a comment",
+    "empty": "No articles found in this blog."
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "total": "Total:",
+    "checkout": "Checkout",
+    "update": "Update cart",
+    "clear_all": "Clear cart",
+    "confirm_clear_title": "Are you sure?",
+    "confirm_clear_text": "This will remove all items from your cart.",
+    "remove": "Remove",
+    "del_confirm_title": "Delete product?",
+    "del_confirm_yes": "Yes",
+    "del_confirm_no": "No"
+  },
+  "customers": {
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "title": "Login"
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "empty": "No products found",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    }
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Add to Apple Wallet",
+    "card": "Gift card",
+    "expired": "This gift card has expired",
+    "expires_on": "Expires on {{ expires_on }}",
+    "use_at_checkout": "Use this gift card at checkout"
+  },
+  "password": {
+    "title": "This shop is private",
+    "password": "Password",
+    "enter": "Enter"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search articles, pages, or products",
+    "submit": "Search",
+    "no_results_html": "No results found for {{ terms }}",
+    "results_for_html": "{{ count }} results found for {{ terms }}",
+    "settings": {
+      "custom_translations": "Custom translations (optional)",
+      "search_settings": "Search settings",
+      "custom_title": "Custom title",
+      "custom_placeholder": "Custom placeholder",
+      "custom_submit": "Custom button text",
+      "results_per_page": "Results per page",
+      "leave_blank": "Leave blank to use theme translation",
+      "products_only": "Search products only"
+    }
+  },
+  "pagination": {
+    "label": "Pagination",
+    "page": "Page {{ number }}",
+    "previous": "Previous page",
+    "next": "Next page"
+  },
+  "labels": {
+    "menu": "Menu",
+    "logo": "Logo",
+    "show_payment_icons": "Show payment icons"
+  },
+  "products": {
+    "product": {
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable",
+      "vendor": "Vendor",
+      "quantity": "Quantity",
+      "product_fallback": "Example Product",
+      "add_to_cart": "Add to cart",
+      "added_to_cart": "Added to cart:",
+      "add_to_wishlist": "Add to wishlist",
+      "description_fallback": "A premium handcrafted product made with attention to every detail."
+    },
+    "facets": {
+      "filter_button": "Filters",
+      "clear_all": "Clear all"
+    }
+  },
+  "sections": {
+    "header": {
+      "settings": {
+        "logo": {
+          "label": "Logo Image"
+        },
+        "menu": {
+          "label": "Main Menu"
+        }
+      },
+      "menu_more": "More"
+    },
+    "video_hero": {
+      "heading": "Crafted to last. Designed to be simple.",
+      "subtitle": "A premium handcrafted product made with attention to every detail.",
+      "button_label": "Shop Now"
+    },
+    "best_sellers": {
+      "section_label": "Best Sellers",
+      "title": "Shop our top picks",
+      "collection_fallback": "Collection",
+      "product_fallback": "Example Product",
+      "cart_added": "Added to cart:",
+      "wishlist_added": "Added to wishlist:"
+    },
+    "masonry_gallery": {
+      "title": "Featured Collection",
+      "quick_view": "Quick view",
+      "add_to_cart": "Add to cart",
+      "full_details": "Full details"
+    },
+    "product_slider": {
+      "title": "Our Highlights",
+      "no_collection": "Please select a collection in section settings",
+      "prev_slide": "Previous slide",
+      "next_slide": "Next slide"
+    },
+    "banner_slider": {
+      "title": "Promo Highlights",
+      "prev_slide": "Previous slide",
+      "next_slide": "Next slide"
+    },
+    "footer": {
+      "navigation": "Footer navigation",
+      "menu": "Menu",
+      "we_accept": "We accept",
+      "brand": "About us"
+    },
+    "usp": {
+      "free_shipping_title": "Free Shipping",
+      "free_shipping_text": "On all orders over $100",
+      "easy_returns_title": "Easy Returns",
+      "easy_returns_text": "30-day return policy",
+      "secure_payment_title": "Secure Payment",
+      "secure_payment_text": "100% secure checkout",
+      "support_title": "24/7 Support",
+      "support_text": "We are here to help"
+    },
+    "newsletter": {
+      "title": "Join our community",
+      "subtitle": "Get updates and special offers",
+      "placeholder": "Your email address",
+      "button": "Subscribe",
+      "note": "We respect your privacy",
+      "success": "Thanks for subscribing!"
+    },
+    "reviews": {
+      "title": "What our customers say",
+      "subtitle": "Real reviews from real people",
+      "rating_label": "Rated {{ rating }} out of 5",
+      "cta": "Read all reviews"
+    },
+    "about_brand": {
+      "title": "Peak Framework",
+      "subtitle": "Flexible, modern, and fully modular Shopify theme",
+      "description": "<p><b>Peak</b> is an ecosystem of isolated sections. Each block features independent logic and styles, fully manageable via the customizer. Control colors, fonts, and spacing with zero coding. Your freedom is our priority.</p>"
+    },
+    "main_search": {
+      "title": "Search",
+      "heading": "Search Results"
+    }
+  },
+  "pages": {
+    "contact": {
+      "email": "Email",
+      "location": "Location",
+      "location_value": "Kyiv, Ukraine",
+      "hours": "Working hours",
+      "hours_value": "Mon – Fri / 10:00 – 18:00"
+    },
+    "wishlist": {
+      "title": "My Wishlist",
+      "empty": "Your wishlist is empty",
+      "clear": "Clear wishlist?",
+      "confirm_clear": "Are you sure?",
+      "go_shopping": "Go shopping"
+    }
+  },
+  "forms": {
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send message",
+    "success": "Thank you! Your message has been sent."
+  }
+}

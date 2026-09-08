@@ -1,17 +1,162 @@
-{% comment %}
-  This section is used in the page template to render store pages like About us
-  or Contact us.
+{%- assign sid = section.id -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/page
-{% endcomment %}
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
 
-<h1>{{ page.title }}</h1>
+  assign is_design_mode = request.design_mode
+-%}
 
-{{ page.content }}
+<section
+  id="page-{{ sid }}"
+  class="page-content section page-width"
+  data-component="main-page"
+>
+  <div class="page-content__container" style="--content-max-width: {{ section.settings.content_max_width }}px;">
+    {% if section.settings.show_title %}
+      {% if page.title != blank or is_design_mode %}
+        <h1 class="page-content__title">
+          {{ page.title | default: 'Example Page Title' | escape }}
+        </h1>
+      {% endif %}
+    {% endif %}
+
+    {% if page.content != blank or is_design_mode %}
+      <div class="page-content__body rte">
+        {% if page.content != blank %}
+          {{ page.content }}
+        {% elsif is_design_mode %}
+          <p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>
+          <p>This is placeholder content rendered when viewing this section inside the theme editor without a specific page attached.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% style %}
+#page-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#page-{{ sid }} .page-content__container {
+  max-width: var(--content-max-width, 760px);
+  margin: 0 auto;
+}
+
+#page-{{ sid }} .page-content__title {
+  margin: 0 0 var(--space-lg, 24px);
+  color: var(--color-text-primary);
+  font-size: var(--heading-lg, 36px);
+  font-weight: var(--font-weight-bold, 700);
+  line-height: var(--line-height-heading, 1.2);
+}
+
+#page-{{ sid }} .page-content__body {
+  color: var(--color-text-primary);
+  line-height: var(--line-height-base, 1.6);
+  font-size: var(--font-size-base, 16px);
+}
+
+#page-{{ sid }} .page-content__body > *:first-child {
+  margin-top: 0;
+}
+
+#page-{{ sid }} .page-content__body > *:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  #page-{{ sid }} .page-content__title {
+    font-size: var(--heading-sm, 24px);
+  }
+}
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.page",
-  "settings": []
+  "name": "Page",
+  "tag": "section",
+  "class": "section-main-page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show page title",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 600,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Content max width",
+      "default": 760
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Page",
+      "settings": {
+        "show_title": true,
+        "content_max_width": 760,
+        "color_mode": "theme",
+        "bg_color": "#FFFFFF",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  ]
 }
 {% endschema %}

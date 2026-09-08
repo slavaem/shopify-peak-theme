@@ -1,56 +1,448 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+{%- assign sid = section.id -%}
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+{%- liquid
+  assign is_design_mode = request.design_mode
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+  assign bg_value = 'var(--color-surface-inverse)'
+  assign text_value = 'var(--color-background)'
+
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+    assign text_value = section.settings.text_color
+  endif
+
+  assign active_columns = 0
+
+  if section.settings.show_brand
+    assign active_columns = active_columns | plus: 1
+  endif
+
+  if section.settings.show_menu and section.settings.menu != blank or is_design_mode
+    assign active_columns = active_columns | plus: 1
+  endif
+
+  if section.settings.show_payment_icons
+    assign active_columns = active_columns | plus: 1
+  endif
+-%}
+
+<footer id="section-{{ sid }}" class="site-footer" data-component="footer">
+  <div class="page-width">
+    <div class="footer__grid">
+      
+      {% if section.settings.show_brand %}
+        <div class="footer__col footer__col--brand">
+          <h4 class="footer__heading">
+            {% if section.settings.brand_heading != blank %}
+              {{ section.settings.brand_heading }}
+            {% else %}
+              {{ 'sections.footer.brand' | t | default: 'About us' }}
+            {% endif %}
+          </h4>
+
+          <div class="footer__logo">
+            {% if section.settings.footer_logo %}
+              {% render 'image',
+                image: section.settings.footer_logo,
+                width: section.settings.logo_width,
+                wrapper_class: 'footer__logo-wrapper',
+                loading: 'lazy',
+                alt: shop.name
+              %}
+            {% else %}
+              <span class="footer__brand-title">{{ shop.name }}</span>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_brand_description and section.settings.brand_description != blank %}
+            <div class="footer__description rte">
+              {{ section.settings.brand_description }}
+            </div>
+          {% endif %}
+
+          {% if section.settings.show_copyright %}
+            <div class="footer__copyright">
+              &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+
+              {% if section.settings.show_powered_by %}
+                <br>
+                <small>{{ powered_by_link }}</small>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_menu %}
+        <div class="footer__col footer__col--links">
+          <h4 class="footer__heading">
+            {% if section.settings.menu_heading != blank %}
+              {{ section.settings.menu_heading }}
+            {% else %}
+              {{ 'sections.footer.menu' | t | default: 'Menu' }}
+            {% endif %}
+          </h4>
+
+          <nav class="footer__nav" aria-label="{{ 'sections.footer.navigation' | t | default: 'Footer Navigation' }}">
+            {% if section.settings.menu != blank and section.settings.menu.links.size > 0 %}
+              {% for link in section.settings.menu.links %}
+                <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+              {% endfor %}
+            {% elsif is_design_mode %}
+              <a href="#" class="footer__link">Home</a>
+              <a href="#" class="footer__link">Catalog</a>
+              <a href="#" class="footer__link">Contact</a>
+            {% endif %}
+          </nav>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_payment_icons %}
+        <div class="footer__col footer__col--payments">
+          <h4 class="footer__heading">
+            {% if section.settings.payments_heading != blank %}
+              {{ section.settings.payments_heading }}
+            {% else %}
+              {{ 'sections.footer.we_accept' | t | default: 'We accept' }}
+            {% endif %}
+          </h4>
+
+          <div class="footer__payment-icons">
+            {% if shop.enabled_payment_types.size > 0 %}
+              {% for type in shop.enabled_payment_types %}
+                {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+              {% endfor %}
+            {% else %}
+              <span class="payment-icon payment-icon--placeholder">Visa / Mastercard</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
   </div>
 </footer>
 
-{% stylesheet %}
-  footer {
+{% style %}
+#section-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  --section-text: {{ text_value }};
+  --payment-icon-width: 38px;
+  --payment-icon-height: 24px;
+
+  background: var(--section-bg);
+  color: var(--section-text);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+  margin-top: {{ section.settings.margin_top }}px;
+}
+
+#section-{{ sid }} .footer__logo-wrapper {
+  max-width: {{ section.settings.logo_width }}px;
+  width: 100%;
+}
+
+#section-{{ sid }} .footer__logo-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#section-{{ sid }} .footer__brand-title {
+  font-size: var(--font-size-xl, 24px);
+  font-weight: var(--font-weight-bold, 700);
+}
+
+#section-{{ sid }} .footer__description {
+  margin-bottom: var(--space-md);
+  color: inherit;
+  opacity: 0.8;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+#section-{{ sid }} .footer__description > *:last-child {
+  margin-bottom: 0;
+}
+
+/* GRID LAYOUT */
+
+#section-{{ sid }} .footer__grid {
+  {% if active_columns == 0 %}
+    display: none;
+  {% else %}
+    display: grid;
+    gap: var(--space-lg);
+  {% endif %}
+
+  {% if active_columns == 1 %}
+    grid-template-columns: 1fr;
+  {% elsif active_columns == 2 %}
+    grid-template-columns: repeat(2, 1fr);
+  {% elsif active_columns >= 3 %}
+    grid-template-columns: 1.5fr 1fr 1fr;
+  {% endif %}
+}
+
+#section-{{ sid }} .footer__logo {
+  display: inline-block;
+  margin-bottom: var(--space-sm);
+}
+
+#section-{{ sid }} .footer__copyright {
+  font-size: var(--font-size-sm);
+  opacity: 0.65;
+  line-height: 1.6;
+}
+
+#section-{{ sid }} .footer__heading {
+  font-size: var(--font-size-xs, 12px);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--space-md, 20px);
+  opacity: 0.75;
+  font-weight: var(--font-weight-bold, 700);
+}
+
+#section-{{ sid }} .footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 10px);
+}
+
+#section-{{ sid }} .footer__link {
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.8;
+  transition: opacity 0.25s ease;
+  font-size: var(--font-size-sm, 14px);
+}
+
+#section-{{ sid }} .footer__link:hover {
+  opacity: 1;
+}
+
+#section-{{ sid }} .footer__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+#section-{{ sid }} .footer__payment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs, 8px);
+}
+
+#section-{{ sid }} .payment-icon {
+  width: var(--payment-icon-width);
+  height: var(--payment-icon-height);
+  opacity: 0.9;
+}
+
+#section-{{ sid }} a {
+  color: inherit;
+}
+
+@media (max-width: 768px) {
+  #section-{{ sid }} .footer__grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: var(--space-lg, 32px);
+  }
+
+  #section-{{ sid }} .footer__col {
     display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+    flex-direction: column;
+    align-items: center;
   }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
+
+  #section-{{ sid }} .footer__nav,
+  #section-{{ sid }} .footer__payment-icons {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
-  footer .footer__links,
-  footer .footer__payment {
-    display: flex;
-    gap: 1rem;
-  }
-{% endstylesheet %}
+}
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.footer",
+  "name": "Footer",
+  "tag": "footer",
+  "class": "section-footer",
   "settings": [
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand",
+      "label": "Show brand block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brand_heading",
+      "label": "Brand heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 220
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_description",
+      "label": "Show brand description",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "brand_description",
+      "label": "Brand description",
+      "default": "<p>Tell your customers about your brand and what makes your store unique.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_menu",
+      "label": "Show menu",
+      "default": true
+    },
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "Main menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_heading",
+      "label": "Menu heading"
+    },
+    {
+      "type": "header",
+      "content": "Payments"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
+      "label": "Show payment icons",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "payments_heading",
+      "label": "Payments heading"
+    },
+    {
+      "type": "header",
+      "content": "Copyright"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_copyright",
+      "label": "Show copyright",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_powered_by",
+      "label": "Show powered by Shopify",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors & Spacing"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Footer background",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Footer text color",
+      "default": "#EAEAEA"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "settings": {
+        "show_brand": true,
+        "brand_heading": "",
+        "logo_width": 220,
+        "show_brand_description": true,
+        "brand_description": "<p>Tell your customers about your brand and what makes your store unique.</p>",
+        "show_menu": true,
+        "menu_heading": "",
+        "show_payment_icons": true,
+        "payments_heading": "",
+        "show_copyright": true,
+        "show_powered_by": false,
+        "color_mode": "theme",
+        "bg_color": "#121212",
+        "text_color": "#EAEAEA",
+        "margin_top": 80,
+        "padding_top": 80,
+        "padding_bottom": 50
+      }
     }
   ]
 }

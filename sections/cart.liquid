@@ -1,37 +1,561 @@
-{% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+{%- assign sid = section.id -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
-{% endcomment %}
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
 
-<h1>{{ 'cart.title' | t }}</h1>
+  assign is_design_mode = request.design_mode
+-%}
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+<section
+  id="cart-{{ sid }}"
+  class="cart {{ section.settings.container_width | default: 'page-width' }}"
+  data-component="cart-section"
+>
+  <div class="cart__inner">
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+    <div class="cart__header">
+      <h1 class="cart__title">{{ 'cart.title' | t | default: 'Cart' }}</h1>
+    </div>
+
+    <div class="js-cart-form-wrapper">
+      {% if cart.item_count > 0 %}
+        <form action="{{ routes.cart_url }}" method="post" class="cart__form" id="cart-form-{{ sid }}" data-component="cart-form">
+          <div class="cart__table">
+            {% for item in cart.items %}
+              <div class="cart-item" data-component="cart-item" data-key="{{ item.key }}">
+                <div class="cart-item__media">
+                  {% render 'image', image: item.image, url: item.url %}
+                </div>
+
+                <div class="cart-item__details">
+                  <a href="{{ item.url_to_remove }}" class="cart-item__remove-link" data-remove-item data-key="{{ item.key }}">
+                    <svg viewBox="0 0 16 16" fill="none" width="12"><path d="M1 1L15 15M15 1L1 15" stroke="currentColor" stroke-width="2"/></svg>
+                  </a>
+                  <p class="cart-item__name"><a href="{{ item.url }}">{{ item.product.title }}</a></p>
+                  {% unless item.product.has_only_default_variant %}
+                    <p class="cart-item__variant text-small">{{ item.variant.title }}</p>
+                  {% endunless %}
+                </div>
+
+                <div class="cart-item__actions">
+                  <div class="cart-item__quantity">
+                    <button type="button" class="quantity__btn" data-action="qty-minus" aria-label="Decrease quantity">-</button>
+                    <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" class="quantity__input" data-element="quantity-input" data-key="{{ item.key }}">
+                    <button type="button" class="quantity__btn" data-action="qty-plus" aria-label="Increase quantity">+</button>
+                  </div>
+                  <p class="cart-item__price" data-line-price="{{ item.key }}">
+                    {{ item.final_line_price | money }}
+                  </p>
+                </div>
+
+                <div class="cart-item__confirm-delete" data-element="confirm-delete" hidden>
+                  <p>{{ 'cart.del_confirm_title' | t | default: 'Delete product?' }}</p>
+                  <div class="confirm-actions">
+                    <button type="button" class="btn-confirm btn-confirm--yes" data-action="cart-remove-confirm" data-key="{{ item.key }}">{{ 'cart.del_confirm_yes' | t | default: 'Yes' }}</button>
+                    <button type="button" class="btn-confirm btn-confirm--no" data-action="cart-remove-cancel">{{ 'cart.del_confirm_no' | t | default: 'No' }}</button>
+                  </div>
+                </div>
+
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="cart__footer">
+            <div class="cart__summary">
+              <p class="cart__total" id="cart-total">
+                {{ 'cart.total' | t | default: 'Total:' }} <span class="js-cart-total-value" data-element="cart-total-value">{{ cart.total_price | money }}</span>
+              </p>
+              <button type="submit" name="checkout" class="btn btn--primary btn--checkout">{{ 'cart.checkout' | t | default: 'Checkout' }}</button>
+            </div>
+            {% if section.settings.show_clear_cart %}
+              <button type="button" class="cart__clear-btn" data-action="cart-clear">{{ 'cart.clear_all' | t | default: 'Clear cart' }}</button>
+            {% endif %}
+          </div>
+        </form>
+      {% elsif is_design_mode %}
+        <div class="cart__form cart__form--preview">
+          <div class="cart__table">
+            <div class="cart-item">
+              <div class="cart-item__media">
+                {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+              <div class="cart-item__details">
+                <p class="cart-item__name"><a href="#">Example Product (Preview)</a></p>
+                <p class="cart-item__variant text-small">Sample Variant</p>
+              </div>
+              <div class="cart-item__actions">
+                <div class="cart-item__quantity">
+                  <button type="button" class="quantity__btn">-</button>
+                  <input type="number" value="1" class="quantity__input" readonly>
+                  <button type="button" class="quantity__btn">+</button>
+                </div>
+                <p class="cart-item__price">$99.00</p>
+              </div>
+            </div>
+          </div>
+          <div class="cart__footer">
+            <div class="cart__summary">
+              <p class="cart__total">{{ 'cart.total' | t | default: 'Total:' }} <span>$99.00</span></p>
+              <button type="button" class="btn btn--primary btn--checkout">{{ 'cart.checkout' | t | default: 'Checkout' }}</button>
+            </div>
+            {% if section.settings.show_clear_cart %}
+              <button type="button" class="cart__clear-btn">{{ 'cart.clear_all' | t | default: 'Clear cart' }}</button>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cart__empty js-cart-empty" {% if cart.item_count > 0 or is_design_mode %}hidden{% endif %}>
+      <p>{{ 'cart.empty' | t | default: 'Your cart is empty' }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">{{ 'general.continue_shopping' | t | default: 'Continue shopping' }}</a>
+    </div>
+  </div>
+
+  <script>
+    window.Shopify = window.Shopify || {};
+    Shopify.money_format = {{ shop.money_format | json }};
+  </script>
+</section>
+
+{% style %}
+#cart-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.section_padding_top }}px;
+  padding-bottom: {{ section.settings.section_padding_bottom }}px;
+}
+
+#cart-{{ sid }}.page-width {
+  width: 100%;
+}
+
+#cart-{{ sid }}.full-width {
+  width: 100%;
+  max-width: 100%;
+}
+
+#cart-{{ sid }}.full-width .cart__inner {
+  width: 100%;
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding-inline: var(--page-margin);
+}
+
+#cart-{{ sid }} .cart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+#cart-{{ sid }} .cart__clear-btn {
+  display: inline-block;
+  background: transparent;
+  color: var(--color-text-muted); 
+  border: 1px solid var(--color-border);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--space-sm);
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+#cart-{{ sid }} .cart__clear-btn:hover {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-danger); 
+  border-color: var(--color-danger);
+}
+
+#cart-{{ sid }} .cart__clear-btn[data-state="confirming"] {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-background);
+  opacity: 1;
+  font-weight: 600;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+}
+
+#cart-{{ sid }} .cart-item__remove-link svg {
+  display: block;
+  transition: transform var(--transition-fast);
+}
+
+#cart-{{ sid }} .cart-item__remove-link:hover svg {
+  color: var(--color-danger);
+  transform: scale(1.2);
+}
+
+#cart-{{ sid }} .cart-item__remove-link {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  opacity: 0.4;
+}
+
+#cart-{{ sid }} .cart-item:hover .cart-item__remove-link {
+  opacity: 1;
+}
+
+#cart-{{ sid }} .cart-item__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#cart-{{ sid }} .cart-item__price {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  letter-spacing: 0.3px;
+  transition: all var(--transition-fast);
+  padding-left: var(--space-xs);
+}
+
+#cart-{{ sid }} .cart__form.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#cart-{{ sid }} .cart-item.is-removing {
+  transform: translateX(20px);
+  opacity: 0;
+  transition: all var(--transition-base);
+}
+
+#cart-{{ sid }} .btn--checkout {
+  max-width: var(--checkout-width, 320px);
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  height: var(--button-height-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+#cart-{{ sid }} .cart-item {
+  display: grid;
+  position: relative;
+  grid-template-columns: minmax(80px, 120px) minmax(200px, 1fr) auto;
+  gap: {{ section.settings.content_gap | default: 20 }}px;
+  align-items: center;
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+#cart-{{ sid }} .cart-item:hover {
+  background: var(--color-surface-subtle);
+}
+
+#cart-{{ sid }} .cart__footer {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: {{ section.settings.content_gap | default: 20 }}px;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+#cart-{{ sid }} .cart-item__quantity {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+#cart-{{ sid }} .quantity__btn {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background var(--transition-fast), color var(--transition-fast), transform 0.1s ease;
+  padding: 0;
+  user-select: none;
+}
+
+#cart-{{ sid }} .quantity__btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+#cart-{{ sid }} .quantity__btn:active {
+  background: var(--color-surface-subtle);
+  transform: scale(0.9);
+}
+
+#cart-{{ sid }} .quantity__input {
+  width: var(--input-width-sm);
+  height: var(--control-size-md);
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield !important;
+}
+
+#cart-{{ sid }} .quantity__input::-webkit-outer-spin-button,
+#cart-{{ sid }} .quantity__input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+
+#cart-{{ sid }} .quantity__input:focus {
+  outline: none;
+  background: var(--color-surface);
+}
+
+#cart-{{ sid }} .cart-item__details {
+  cursor: pointer;
+}
+
+#cart-{{ sid }} .cart__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+}
+
+#cart-{{ sid }} .cart-item.updated {
+  background-color: var(--color-success-soft);
+  transition: background-color 0.3s ease;
+}
+
+#cart-{{ sid }} .cart-item.updated .cart-item__price {
+  color: var(--color-success);
+  transform: scale(1.1);
+}
+
+#cart-{{ sid }} .cart-item__confirm-delete {
+  position: absolute;
+  inset: 0;
+  background: var(--color-surface-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+#cart-{{ sid }} .cart-item__confirm-delete p {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+#cart-{{ sid }} .confirm-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+#cart-{{ sid }} .btn-confirm {
+  padding: var(--space-2xs) var(--page-margin);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+#cart-{{ sid }} .btn-confirm--yes {
+  background: var(--color-danger);
+  color: var(--color-background);
+  border-color: var(--color-danger);
+}
+
+#cart-{{ sid }} .btn-confirm--yes:hover {
+  background: var(--color-danger-hover);
+}
+
+#cart-{{ sid }} .btn-confirm--no {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+#cart-{{ sid }} .btn-confirm--no:hover {
+  background: var(--color-surface-subtle);
+}
+
+#cart-{{ sid }} .cart-item__confirm-delete[hidden] {
+  display: none;
+}
+
+@keyframes price-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); color: var(--color-success); }
+  100% { transform: scale(1); }
+}
+
+#cart-{{ sid }} .price-updated {
+  display: inline-block; 
+  animation: price-pulse 0.4s ease-out;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  #cart-{{ sid }} .cart-item {
+    grid-template-columns: 80px 1fr;
+  }
+  #cart-{{ sid }} .cart-item__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+  }
+  #cart-{{ sid }} .cart-item__remove-link {
+    top: var(--space-2xs);
+    right: var(--space-2xs);
+  }
+  #cart-{{ sid }} .quantity__btn {
+    width: var(--control-size-sm);
+    height: var(--control-size-sm);
+  }
+  #cart-{{ sid }} .quantity__input {
+    width: var(--input-width-sm);
+    height: var(--control-size-sm);
+  }
+}
+
+{% if section.settings.sticky_summary_mobile %}
+@media (max-width: 768px) {
+  #cart-{{ sid }} .cart__summary {
+    position: sticky;
+    top: var(--space-md);
+  }
+}
+{% endif %}
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.cart",
-  "settings": []
+  "name": "Cart",
+  "tag": "section",
+  "class": "section-cart",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "Container width",
+      "options": [
+        { "value": "page-width", "label": "Boxed" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "content_gap",
+      "label": "Cart item spacing",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_clear_cart",
+      "label": "Show clear cart button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_summary_mobile",
+      "label": "Sticky summary on mobile",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart",
+      "settings": {
+        "container_width": "page-width",
+        "section_padding_top": 48,
+        "section_padding_bottom": 48,
+        "content_gap": 20,
+        "color_mode": "theme",
+        "bg_color": "#FFFFFF",
+        "show_clear_cart": true,
+        "sticky_summary_mobile": false
+      }
+    }
+  ]
 }
 {% endschema %}

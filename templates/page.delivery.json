@@ -1,0 +1,37 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-builder",
+      "blocks": {
+        "hero": {
+          "type": "hero",
+          "settings": {
+            "title": "Delivery & Returns",
+            "subtitle": "We make sure your gear arrives safely and ready for your next ride."
+          }
+        },
+        "shipping_text": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>Order Processing & Shipping</h2><p>Orders are usually processed within 1–2 business days. Once shipped, you'll receive a tracking number.</p>"
+          }
+        },
+        "delivery_features": {
+          "type": "features",
+          "settings": {
+            "title_1": "Fast Shipping",
+            "text_1": "2-5 business days delivery worldwide.",
+            "title_2": "Secure Packaging",
+            "text_2": "Protective materials for every snowboard."
+          }
+        }
+      },
+      "block_order": ["hero", "shipping_text", "delivery_features"],
+      "settings": {
+        "text_alignment": "left",
+        "padding_top": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

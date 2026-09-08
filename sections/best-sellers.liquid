@@ -1,469 +1,447 @@
+{% comment %}
+  Best Sellers section
+  - Fully accessible WAI-ARIA Tabs implementation
+  - Keyboard navigation (Arrows, Home, End)
+  - Fully self-contained (CSS + JS scoped per section instance)
+  - Uses container queries for component-level responsiveness
+{% endcomment %}
+
 {%- assign sid = section.id -%}
 
-<div id="section-{{ sid }}" class="best-sellers">
-  <div class="page-width">
+<div id="section-{{ sid }}" class="best-sellers" data-component="best-sellers">
+  {%- liquid
+    assign default_label = 'sections.best_sellers.section_label' | t | default: 'Best Sellers'
+    assign default_title = 'sections.best_sellers.title' | t | default: 'Trending Products'
     
-    <div class="grid-container">
-     <div class="nav-col">
-        <div class="header-group">
-          {% if section.settings.section_label != blank %}
-            <span class="label">{{ section.settings.section_label }}</span>
-          {% endif %}
-          {% if section.settings.title != blank %}
-            <h2 class="title">{{ section.settings.title }}</h2>
-          {% endif %}
+    assign section_label = section.settings.section_label | default: default_label
+    assign section_title = section.settings.title | default: default_title
+  -%}
+
+  <div class="page-width">
+    <div class="best-sellers__container-wrapper">
+      <div class="grid-container">
+        
+        <!-- NAVIGATION -->
+        <div class="nav-col">
+          <div class="header-group">
+            {% if section.settings.section_label != blank %}
+              <span class="label">
+                {{ section_label }}
+              </span>
+            {% endif %}
+            
+            {% if section.settings.title != blank %}
+              <h2 class="title" id="title-{{ sid }}">
+                {{ section_title }}
+              </h2>
+            {% endif %}
+          </div>
+
+          <nav class="nav-wrapper">
+            <ul 
+              class="nav-list" 
+              role="tablist" 
+              aria-labelledby="title-{{ sid }}"
+              data-tabs-nav
+            >
+              {% for block in section.blocks %}
+                {% liquid
+                  assign fallback_text = 'sections.best_sellers.collection_fallback' | t | default: 'Collection'
+                  assign nav_title = block.settings.collection.title
+
+                  if block.settings.collection_title != blank
+                    assign nav_title = block.settings.collection_title
+                  endif
+
+                  assign nav_title = nav_title | default: fallback_text
+                  assign is_first = forloop.first
+                %}
+                <li role="presentation" {{ block.shopify_attributes }}>
+                  <button
+                    id="tab-{{ sid }}-{{ forloop.index0 }}"
+                    class="nav-btn {% if is_first %}active{% endif %}"
+                    role="tab"
+                    aria-selected="{% if is_first %}true{% else %}false{% endif %}"
+                    aria-controls="panel-{{ sid }}-{{ forloop.index0 }}"
+                    tabindex="{% if is_first %}0{% else %}-1{% endif %}"
+                    data-index="{{ forloop.index0 }}"
+                    data-action="tab-switch"
+                    type="button"
+                  >
+                    <span class="nav-text">{{ nav_title }}</span>
+                    <span class="nav-arrow" aria-hidden="true">→</span>
+                  </button>
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
         </div>
 
-        <nav class="nav-wrapper">
-          <ul class="nav-list js-tabs-nav">
-            {% for block in section.blocks %}
-              {% liquid
-                assign nav_title = block.settings.collection.title
-                if block.settings.collection_title != blank
-                  assign nav_title = block.settings.collection_title
-                endif
-                assign nav_title = nav_title | default: 'Collection'
-              %}
-              <li>
-                <button 
-                  class="nav-btn {% if forloop.first %}active{% endif %}" 
-                  data-index="{{ forloop.index0 }}"
-                  type="button">
-                  <span class="nav-text">{{ nav_title }}</span>
-                  <span class="nav-arrow">→</span>
-                </button>
-              </li>
-            {% endfor %}
-          </ul>
-        </nav>
-      </div>
+        <!-- CONTENT -->
+        <div class="content-col">
+          {% for block in section.blocks %}
+            {% liquid
+              assign product = blank
+              assign is_first = forloop.first
 
-      <div class="content-col js-tabs-content">
-        {% for block in section.blocks %}
-          
-          {% liquid
-            assign product = blank
-            assign current_variant = nil
+              if block.settings.product != blank
+                assign product = block.settings.product
+              elsif block.settings.collection != blank and block.settings.collection.products.size > 0
+                assign product = block.settings.collection.products.first
+              endif
+            %}
 
-            if block.settings.product != blank
-             assign product = block.settings.product
-            elsif block.settings.collection != blank and block.settings.collection.products.size > 0
-             assign product = block.settings.collection.products.first
-            endif
-                
-           if product == blank
-             continue
-           endif
-
-            assign current_variant = product.selected_or_first_available_variant
-          %}
-
-          <div 
-            class="product-card {% if forloop.first %}active{% endif %}" 
-            data-index="{{ forloop.index0 }}">
-            
-            <div class="card-inner">
-              <div class="image-wrapper-container">
-                 <a href="{{ product.url | default: '#' }}" class="image-wrapper">
-                  {% if product != blank and product.featured_image != blank %}
-                    <picture>
-                      <source media="(max-width: 767px)" srcset="{{ product.featured_image | image_url: width: 300 }} 1x, {{ product.featured_image | image_url: width: 600 }} 2x">
-                      <source media="(min-width: 768px)" srcset="{{ product.featured_image | image_url: width: 600 }} 1x, {{ product.featured_image | image_url: width: 1200 }} 2x">
-                      <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | escape }}" loading="lazy" width="600" height="600" class="img-cover">
-                    </picture>
-                  {% else %}
-                    {{ 'product-apparel-1' | placeholder_svg_tag: 'img-cover placeholder-svg' }}
-                  {% endif %}
-                </a>
-
-                {% if product != blank and product.tags.size > 0 %}
-                  <div class="tags-list">
-                    {% for tag in product.tags limit: 3 %}
-                      {% assign tag_handle = tag | downcase %}
-                      <span class="tag {% if tag_handle == 'sale' %}tag-red{% else %}tag-basic{% endif %}">{{ tag }}</span>
-                    {% endfor %}
+            <div
+              id="panel-{{ sid }}-{{ forloop.index0 }}"
+              class="tab-panel {% if is_first %}active{% endif %}"
+              role="tabpanel"
+              aria-labelledby="tab-{{ sid }}-{{ forloop.index0 }}"
+              tabindex="0"
+              {% unless is_first %}hidden{% endunless %}
+              data-index="{{ forloop.index0 }}"
+              data-tab-panel
+              {{ block.shopify_attributes }}
+            >
+              {% if product != blank %}
+                {% render 'product-card', product_item: product, show_vendor: true %}
+              {% else %}
+                <div class="best-sellers__placeholder-card">
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  <div class="placeholder-card__info">
+                    <p class="placeholder-card__title">Product Title</p>
+                    <p class="placeholder-card__price">$99.00</p>
                   </div>
-                {% endif %}
-
-                <div class="actions-overlay">
-                <button type="button" 
-                class="icon-btn js-wishlist-btn" 
-                data-title="{{ product.title | escape | default: 'Product' }}">
-                <span>♥</span>
-               </button>
-
-               <button type="button" 
-               class="icon-btn js-atc-btn" 
-               {% if current_variant == nil or product.available == false or product == blank %}disabled{% endif %}
-               {% if current_variant %}data-id="{{ current_variant.id }}"{% endif %}>
-               <span>👁</span>
-               </button>
-              </div>
-               </div>
-
-              <div class="card-info">
-                <div class="info-row">
-                  <a href="{{ product.url | default: '#' }}" class="product-title">
-                    {{ product.title | default: 'Example Product' }}
-                  </a>
-                  <span class="product-price">
-                    {{ current_variant.price | money_without_trailing_zeros }}
-                  </span>
                 </div>
-                
-                {% if product.vendor != blank %}
-                  <div class="product-vendor">{{ product.vendor }}</div>
-                {% endif %}
-              </div>
-
+              {% endif %}
             </div>
-          </div>
-        {% endfor %}
-      </div>
+          {% endfor %}
+        </div>
 
+      </div>
     </div>
   </div>
-
-  <dialog class="wishlist-dialog" id="Dialog-{{ sid }}">
-    <form method="dialog">
-      <button class="close-btn">✕</button>
-    </form>
-    <p class="dialog-msg"></p>
-  </dialog>
 </div>
 
 {% style %}
   #section-{{ sid }} {
-    padding: 60px 0;
-    font-family: sans-serif;
-    margin: 32px 16px;
-  }
-  
-  #section-{{ sid }} .grid-container { 
-    display: flex; 
-    gap: 60px; 
-    align-items: flex-start;
-  }
-
-  #section-{{ sid }} .nav-col { flex: 0 0 30%; width: 30%; }
-  
-  #section-{{ sid }} .header-group { margin-bottom: 40px; }
-  #section-{{ sid }} .label { 
-    font-family: Inter;
-    font-weight: 400;
-    font-style: Regular;
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: 0%;
-    color: #535353;
-    display: block;
-    margin-bottom: 8px; 
-  }
-  #section-{{ sid }} .title { 
-    font-family: Inter;
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 38px;
-    line-height: 46px;
-    letter-spacing: 0%;
-    color: rgba(0, 0, 0, 1);
-  }
-
-  #section-{{ sid }} .nav-list { list-style: none; padding: 0; margin: 0; }
-  #section-{{ sid }} .nav-btn {
-    width: 100%; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    background: none; 
-    border: none;
-    padding: 15px 0; 
-    cursor: pointer; 
-    color: #9D9D9D;
-    transition: 0.3s;
-    text-align: left;
-    font-family: Inter;
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 28px;
-    line-height: 34px;
-    letter-spacing: 0%;
-  }
-  #section-{{ sid }} .nav-arrow { opacity: 0; transition: 0.3s; transform: translateX(-10px); }
-  
-  #section-{{ sid }} .nav-btn.active { color: #000; font-weight: 600;  border-bottom: 1px solid  #000; }
-  #section-{{ sid }} .nav-btn.active .nav-arrow { opacity: 1; transform: translateX(0); }
-
-  #section-{{ sid }} .content-col { flex: 1; min-height: 400px; width: 100%; }
-  #section-{{ sid }} .product-card { display: none; animation: fadeIn 0.5s; }
-  #section-{{ sid }} .product-card.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  #section-{{ sid }} .card-inner { width: 100%; }
-  #section-{{ sid }} .image-wrapper-container {
-    position: relative; 
     width: 100%;
-    aspect-ratio: 1 / 1; 
-    overflow: hidden;
-    background: #f4f4f4;
-    border-radius: 4px; 
-    margin-bottom: 20px;
+    --gap-dynamic: var(--space-xl);
+    padding-block: var(--space-xl);
+    max-width: var(--page-width);
+    margin: 0 auto;
+    font-family: var(--font-primary--family);
   }
-  #section-{{ sid }} .image-wrapper { display: block; width: 100%; height: 100%; }
-  #section-{{ sid }} .img-cover { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-  #section-{{ sid }} .image-wrapper:hover .img-cover { transform: scale(1.05); }
 
-  #section-{{ sid }} .tags-list { 
-    position: absolute; top: 16px; left: 16px; 
-    display: flex; flex-direction: column; gap: 4px; pointer-events: none;
+  #section-{{ sid }} .best-sellers__container-wrapper {
+    container-type: inline-size;
+    container-name: best_sellers;
+    display: block;
+    width: 100%;
+    position: relative;
   }
-  #section-{{ sid }} .tag { padding: 4px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #fff; border-radius: 2px; }
-  #section-{{ sid }} .tag-basic { background: #000; }
-  #section-{{ sid }} .tag-red { background: #D32F2F; }
 
-  #section-{{ sid }} .actions-overlay {
-    position: absolute; top: 15px; right: 15px;
-    display: flex; flex-direction: column; gap: 10px; z-index: 2;
-  }
-  #section-{{ sid }} .icon-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 32px;
-    border: 1px solid #DCDCDC;
-    background: #fff;
-    color: #000;
-    cursor: pointer;
-    display: grid; 
-    place-items: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: 0.2s;
-    font-size: 24px;
-  }
-  #section-{{ sid }} .icon-btn:hover {
-    background: #000;
-    color: #fff; 
-  }
-  #section-{{ sid }} .icon-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  #section-{{ sid }} .card-info {
-    position: absolute;
-    bottom: 16px; 
-    left: 16px;   
-    width: calc(100% - 32px);
-    padding: 24px 32px; 
-    background: #000;
-    color: #fff;
-    border-radius: 16px; 
-    z-index: 2;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: 0.2s;
-    box-sizing: border-box;
-  }
-  #section-{{ sid }} .info-row { 
-    display: flex; 
-    justify-content: space-between;
+  #section-{{ sid }} .grid-container {
+    display: flex;
+    gap: var(--gap-dynamic);
     align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 4px;
-  }
-  #section-{{ sid }} .product-title { 
-    font-size: 16px;
-    line-height: 1.4;
-    color: #fff;
-    text-decoration: none; 
-    font-weight: 500; 
-  }
-  #section-{{ sid }} .product-price {
-    font-size: 16px;
-    font-weight: 600;
-    color: #E41616;
-    white-space: nowrap;
   }
 
-  #section-{{ sid }} .product-vendor { 
-    font-size: 12px; 
-    color: #fff; 
-    text-transform: uppercase; 
-    letter-spacing: 0.05em;
+  #section-{{ sid }} .nav-col {
+    flex: 0 0 35%;
+    width: 35%;
   }
-  #section-{{ sid }} .wishlist-dialog {
-    padding: 40px 30px;
-    border: none;
-    border-radius: 16px; 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    width: 450px;
-    max-width: 90%;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0; 
-    text-align: center; 
-    background: #fff;
-    z-index: 1000;
+
+  #section-{{ sid }} .header-group {
+    margin-bottom: var(--space-md);
   }
-  #section-{{ sid }} .wishlist-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.6); 
-    backdrop-filter: blur(3px); 
+
+  #section-{{ sid }} .label {
+    font-family: var(--font-primary--family);
+    font-weight: var(--font-weight-normal, 400);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base, 1.5);
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: var(--space-xs);
   }
-  #section-{{ sid }} .dialog-msg {
-    font-size: 18px;
-    line-height: 1.5;
-    color: #121212;
+
+  #section-{{ sid }} .title {
+    font-family: var(--font-family-heading, var(--font-primary--family));
+    font-weight: var(--font-weight-bold, 700);
+    font-size: clamp(28px, 4cqw, 38px);
+    line-height: var(--line-height-heading, 1.2);
+    color: var(--color-foreground);
+    word-break: normal;
+  }
+
+  #section-{{ sid }} .nav-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
   }
-  #section-{{ sid }} .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    border: none;
+
+  #section-{{ sid }} .nav-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: none;
-    font-size: 24px;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: var(--space-sm) 0;
     cursor: pointer;
-    color: #9D9D9D;
-    line-height: 1;
-    transition: color 0.2s;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+    text-align: left;
+    font-family: var(--font-primary--family);
+    font-weight: var(--font-weight-medium, 500);
+    font-size: clamp(18px, 3cqw, 28px);
+    line-height: 1.2;
   }
-  #section-{{ sid }} .close-btn:hover {
-    color: #000;
+
+  #section-{{ sid }} .nav-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
-  @media (max-width: 767px) {
-    #section-{{ sid }} { padding: 40px 0; }
-    #section-{{ sid }} .card-info {
-      bottom: 10px;
-      left: 10px;
-      width: calc(100% - 20px);
-      padding: 12px 16px; 
+
+  #section-{{ sid }} .nav-arrow {
+    opacity: 0;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    transform: translateX(-10px);
+  }
+
+  #section-{{ sid }} .nav-btn[aria-selected="true"] {
+    color: var(--color-foreground);
+    font-weight: var(--font-weight-bold, 700);
+    border-bottom-color: var(--color-foreground);
+  }
+
+  #section-{{ sid }} .nav-btn[aria-selected="true"] .nav-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  #section-{{ sid }} .content-col {
+    flex: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  #section-{{ sid }} .tab-panel[hidden] {
+    display: none !important;
+  }
+
+  #section-{{ sid }} .tab-panel:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  #section-{{ sid }} .best-sellers__placeholder-card {
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    background: var(--color-surface-subtle);
+    text-align: center;
+  }
+
+  @container best_sellers (max-width: 767px) {
+    #section-{{ sid }} {
+      padding-block: var(--space-lg);
+      --gap-dynamic: var(--space-md);
     }
+
     #section-{{ sid }} .grid-container {
       flex-direction: column;
-      gap: 20px; 
     }
-    
+
     #section-{{ sid }} .nav-col {
       width: 100%;
       flex: none;
     }
-    
+
     #section-{{ sid }} .nav-btn {
-      font-size: 22px;
-      padding: 14px 0;
+      font-size: var(--heading-sm);
+      padding: var(--space-xs) 0;
     }
 
     #section-{{ sid }} .content-col {
       width: 100%;
-      min-height: auto;
     }
-
-    #section-{{ sid }} .product-card {
-      max-width: 344px; 
-      margin: 0 auto;   
-    }
-
-    #section-{{ sid }} .tag {
-    font-size: 10px;
-    padding: 2px 6px;
-    }
-
-    #section-{{ sid }} .tags-list {
-      gap: 6px;
-      top: 12px;
-      left: 12px;
-    }
-
-    #section-{{ sid }} .actions-overlay {
-      top: 12px;
-      right: 12px;
-      gap: 8px;
-    }
-
-    #section-{{ sid }} .icon-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 16px;
-    }
-    
-    #section-{{ sid }} .header-group { margin-bottom: 20px; }
   }
 {% endstyle %}
 
 <script>
   (function() {
-    const root = document.getElementById('section-{{ sid }}');
-    
-    const navList = root.querySelector('.js-tabs-nav');
-    if(navList) {
-      navList.addEventListener('click', (e) => {
-        const btn = e.target.closest('.nav-btn'); 
-        if (btn) {
-          const index = btn.dataset.index;
-          root.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          root.querySelectorAll('.product-card').forEach(c => {
-            c.classList.toggle('active', c.dataset.index === index);
-          });
+    function initBestSellers() {
+      const root = document.querySelector('#section-{{ sid }}[data-component="best-sellers"]');
+      if (!root) return;
+
+      const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'));
+
+      if (!tabs.length || !panels.length) return;
+
+      function switchTab(newTab) {
+        const targetIndex = newTab.dataset.index;
+
+        tabs.forEach(tab => {
+          const isActive = tab === newTab;
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          tab.setAttribute('tabindex', isActive ? '0' : '-1');
+          tab.classList.toggle('active', isActive);
+        });
+
+        panels.forEach(panel => {
+          const isTarget = panel.dataset.index === targetIndex;
+          if (isTarget) {
+            panel.removeAttribute('hidden');
+            panel.classList.add('active');
+
+            // Подгружаем lazy-картинки и триггерим перерасчет размеров
+            panel.querySelectorAll('img[loading="lazy"]').forEach(img => {
+              img.removeAttribute('loading');
+            });
+            window.dispatchEvent(new Event('resize'));
+          } else {
+            panel.setAttribute('hidden', '');
+            panel.classList.remove('active');
+          }
+        });
+
+        newTab.focus();
+      }
+
+      // Mouse click event
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab));
+      });
+
+      // Keyboard Navigation
+      root.querySelector('[role="tablist"]')?.addEventListener('keydown', (e) => {
+        const currentTab = document.activeElement;
+        if (!tabs.includes(currentTab)) return;
+
+        let targetTab = null;
+        const currentIndex = tabs.indexOf(currentTab);
+
+        switch (e.key) {
+          case 'ArrowDown':
+          case 'ArrowRight':
+            e.preventDefault();
+            targetTab = tabs[(currentIndex + 1) % tabs.length];
+            break;
+
+          case 'ArrowUp':
+          case 'ArrowLeft':
+            e.preventDefault();
+            targetTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
+            break;
+
+          case 'Home':
+            e.preventDefault();
+            targetTab = tabs[0];
+            break;
+
+          case 'End':
+            e.preventDefault();
+            targetTab = tabs[tabs.length - 1];
+            break;
+        }
+
+        if (targetTab) {
+          switchTab(targetTab);
         }
       });
     }
 
-    const dialog = root.querySelector('dialog');
-    const dialogMsg = dialog.querySelector('.dialog-msg');
-    
-    root.addEventListener('click', (e) => {
-      const wBtn = e.target.closest('.js-wishlist-btn');
-      if (wBtn) {
-        dialogMsg.textContent = `"${wBtn.dataset.title} has been added to your wishlist."`;
-        dialog.showModal();
-        document.body.style.overflow = 'hidden';
-      }
-    });
-    dialog.addEventListener('click', (e) => {
-      if (e.target === dialog) dialog.close();
-    });
+    initBestSellers();
 
-    dialog.addEventListener('close', () => {
-   document.body.style.overflow = ''; 
-    });
-
-    root.addEventListener('click', (e) => {
-      const atcBtn = e.target.closest('.js-atc-btn');
-      if (!atcBtn || atcBtn.disabled) return;
-      e.preventDefault();
-      atcBtn.disabled = true; 
-      fetch(window.Shopify.routes.root + 'cart/add.js', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ items: [{ id: Number(atcBtn.dataset.id), quantity: 1 }] })
-      })
-      .then(r => r.json())
-      .then(d => {
-        atcBtn.disabled = false;
-        window.location.href = '/cart';
-      })
-      .catch(err => { console.error(err); atcBtn.disabled = false; });
-    });
+    if (window.Shopify && Shopify.designMode) {
+      document.addEventListener('shopify:section:load', (e) => {
+        if (e.detail.sectionId === '{{ sid }}') {
+          initBestSellers();
+        }
+      });
+    }
   })();
 </script>
 
 {% schema %}
 {
   "name": "Best Sellers",
+  "tag": "section",
+  "class": "section",
   "settings": [
-    { "type": "text", "id": "section_label", "label": "Top Label", "default": "Best Sellers" },
-    { "type": "text", "id": "title", "label": "Main Title", "default": "Trending Products" }
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Top Label",
+      "default": "Best Sellers"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Main Title",
+      "default": "Trending Products"
+    }
   ],
   "blocks": [
     {
       "type": "collection",
-      "name": "Collection",
-      "limit": 3,
+      "name": "Collection Tab",
+      "limit": 5,
       "settings": [
-        { "type": "collection", "id": "collection", "label": "Collection" },
-        { "type": "text", "id": "collection_title", "label": "Custom Title" },
-        { "type": "product", "id": "product", "label": "Override Product" }
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "collection_title",
+          "label": "Custom Tab Title",
+          "info": "Overrides collection name if set."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Override Product",
+          "info": "Force a specific product for this tab instead of the first collection item."
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Best Sellers" }]
+  "presets": [
+    {
+      "name": "Best Sellers Tabs",
+      "settings": {
+        "section_label": "Curated Selection",
+        "title": "Best Sellers"
+      },
+      "blocks": [
+        {
+          "type": "collection",
+          "settings": {
+            "collection_title": "New Arrivals"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "collection_title": "Most Popular"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "collection_title": "Limited Edition"
+          }
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,54 @@
+{% doc %}
+  Cart Notification Toast
+
+  Displays a floating toast notification when an item is added to the cart via AJAX.
+
+  Usage:
+    {% render 'cart-notification' %}
+
+  JS Dependencies:
+    Targeted by [data-component="cart-notification"]
+{% enddoc %}
+
+<dialog
+  id="cart-notification"
+  class="cart-notification"
+  data-component="cart-notification"
+  role="status"
+  aria-live="polite"
+>
+  <div class="cart-notification__inner">
+    <div
+      class="cart-notification__image"
+      data-element="notification-image"
+    ></div>
+
+    <div class="cart-notification__content">
+      <div class="cart-notification__text">
+        <span data-element="notification-message"></span>
+        <strong data-element="notification-title"></strong>
+        <span
+          class="cart-notification__meta"
+          data-element="notification-meta"
+        ></span>
+      </div>
+
+      <a
+        href="{{ routes.cart_url }}"
+        class="cart-notification__link"
+        aria-label="{{ 'cart.title' | t | default: 'View shopping cart' }}"
+      >
+        {{ 'cart.title' | t | default: 'Cart' }} &rarr;
+      </a>
+    </div>
+
+    <button
+      type="button"
+      class="cart-notification__close"
+      data-action="notification-close"
+      aria-label="{{ 'accessibility.close' | t | default: 'Close' }}"
+    >
+      &#10005;
+    </button>
+  </div>
+</dialog>

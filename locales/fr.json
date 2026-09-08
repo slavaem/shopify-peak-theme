@@ -1,0 +1,214 @@
+{
+  "general": {
+    "header": "En-tête",
+    "continue_shopping": "Continuer mes achats",
+    "cancel": "Annuler"
+  },
+  "404": {
+    "title": "404",
+    "not_found": "Page non trouvée.",
+    "back_to_shopping": "Retour à la boutique"
+  },
+  "blog": {
+    "article_comments": "Commentaires",
+    "article_metadata_html": "{{ date }} par {{ author }}",
+    "comment_form_body": "Commentaire",
+    "comment_form_email": "E-mail",
+    "comment_form_name": "Nom",
+    "comment_form_submit": "Publier",
+    "comment_form_title": "Ajouter un commentaire",
+    "empty": "Aucun article trouvé dans ce blog."
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "total": "Total :",
+    "checkout": "Paiement",
+    "update": "Mettre à jour le panier",
+    "clear_all": "Vider le panier",
+    "confirm_clear_title": "Êtes-vous sûr ?",
+    "confirm_clear_text": "Cela supprimera tous les articles de votre panier.",
+    "remove": "Supprimer",
+    "del_confirm_title": "Supprimer le produit?",
+    "del_confirm_yes": "Oui",
+    "del_confirm_no": "Non"
+  },
+  "customers": {
+    "login": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "title": "Connexion"
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "empty": "Aucun produit trouvé",
+    "product_count": {
+      "one": "{{ count }} produit",
+      "other": "{{ count }} produits"
+    }
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Ajouter à Apple Wallet",
+    "card": "Carte-cadeau",
+    "expired": "Cette carte-cadeau a expiré",
+    "expires_on": "Expire le {{ expires_on }}",
+    "use_at_checkout": "Utilisez cette carte-cadeau au moment du paiement"
+  },
+  "password": {
+    "title": "Cette boutique est privée",
+    "password": "Mot de passe",
+    "enter": "Entrer"
+  },
+  "search": {
+    "title": "Recherche",
+    "placeholder": "Rechercher des articles, des pages ou des produits",
+    "submit": "Chercher",
+    "no_results_html": "Aucun résultat trouvé pour {{ terms }}",
+    "results_for_html": "{{ count }} résultats trouvés pour {{ terms }}",
+    "settings": {
+      "custom_translations": "Traductions personnalisées (facultatif)",
+      "search_settings": "Paramètres de recherche",
+      "custom_title": "Titre personnalisé",
+      "custom_placeholder": "Texte de remplacement personnalisé",
+      "custom_submit": "Texte personnalisé du bouton",
+      "leave_blank": "Laissez vide pour utiliser la traduction du thème",
+      "results_per_page": "Résultats par page",
+      "products_only": "Rechercher uniquement des produits"
+    }
+  },
+  "pagination": {
+    "label": "Pagination",
+    "page": "Page {{ number }}",
+    "previous": "Page précédente",
+    "next": "Page suivante"
+  },
+  "labels": {
+    "menu": "Menu",
+    "logo": "Logo",
+    "show_payment_icons": "Afficher les icônes de paiement"
+  },
+  "products": {
+    "product": {
+      "sold_out": "Épuisé",
+      "unavailable": "Indisponible",
+      "vendor": "Marque",
+      "quantity": "Quantité",
+      "product_fallback": "Exemple de produit",
+      "add_to_cart": "Ajouter au panier",
+      "added_to_cart": "Ajouté au panier :",
+      "add_to_wishlist": "Ajouter à la liste d'envies",
+      "description_fallback": "Un produit de qualité supérieure fabriqué avec soin."
+    },
+    "facets": {
+      "filter_button": "Filtres",
+      "clear_all": "Tout effacer"
+    }
+  },
+  "sections": {
+    "header": {
+      "settings": {
+        "logo": {
+          "label": "Image du logo"
+        },
+        "menu": {
+          "label": "Menu principal"
+        }
+      },
+      "menu_more": "Plus"
+    },
+    "video_hero": {
+      "heading": "Conçu pour durer. Pensé pour la simplicité.",
+      "subtitle": "Un produit artisanal de qualité supérieure, fabriqué avec une attention particulière à chaque détail.",
+      "button_label": "Acheter maintenant"
+    },
+    "best_sellers": {
+      "section_label": "Meilleures ventes",
+      "title": "Découvrez nos coups de cœur",
+      "collection_fallback": "Collection",
+      "product_fallback": "Exemple de produit",
+      "cart_added": "Ajouté au panier :",
+      "wishlist_added": "Ajouté à la liste de souhaits :"
+    },
+    "masonry_gallery": {
+      "title": "Collection vedette",
+      "quick_view": "Aperçu rapide",
+      "add_to_cart": "Ajouter au panier",
+      "full_details": "Plus de détails"
+    },
+    "product_slider": {
+      "title": "Nos points forts",
+      "no_collection": "Veuillez sélectionner une collection dans les paramètres de la section",
+      "prev_slide": "Diapositive précédente",
+      "next_slide": "Diapositive suivante"
+    },
+    "banner_slider": {
+      "title": "Promotions à la une",
+      "prev_slide": "Diapositive précédente",
+      "next_slide": "Diapositive suivante"
+    },
+    "footer": {
+      "navigation": "Navigation du pied de page",
+      "menu": "Menu",
+      "we_accept": "Nous acceptons",
+      "brand": "À propos de nous"
+    },
+    "usp": {
+      "free_shipping_title": "Livraison Gratuite",
+      "free_shipping_text": "Sur toutes les commandes de plus de 100€",
+      "easy_returns_title": "Retours Faciles",
+      "easy_returns_text": "Politique de retour de 30 jours",
+      "secure_payment_title": "Paiement Sécurisé",
+      "secure_payment_text": "Paiement 100% sécurisé",
+      "support_title": "Support 24/7",
+      "support_text": "Nous sommes là pour vous aider"
+    },
+    "newsletter": {
+      "title": "Rejoignez notre communauté",
+      "subtitle": "Recevez des mises à jour et des offres spéciales",
+      "placeholder": "Votre adresse e-mail",
+      "button": "S'abonner",
+      "note": "Nous respectons votre vie privée",
+      "success": "Merci pour votre inscription !"
+    },
+    "reviews": {
+      "title": "Ce que disent nos clients",
+      "subtitle": "De vrais avis de vraies personnes",
+      "rating_label": "Noté {{ rating }} sur 5",
+      "cta": "Lire tous les avis"
+    },
+    "about_brand": {
+      "title": "Peak Framework",
+      "subtitle": "Thème Shopify flexible, moderne et entièrement modulaire",
+      "description": "<p><b>Peak</b> est un écosystème de sections isolées. Chaque bloc dispose d'une logique et de styles indépendants, entièrement gérables via l'outil de personnalisation. Contrôlez les couleurs, les polices et l'espacement sans code. Votre liberté est notre priorité.</p>"
+    },
+    "main_search": {
+      "title": "Recherche",
+      "heading": "Résultats de recherche"
+    }
+  },
+  "pages": {
+    "contact": {
+      "email": "E-mail",
+      "location": "Emplacement",
+      "location_value": "Kyiv, Ukraine",
+      "hours": "Heures d'ouverture",
+      "hours_value": "Lun – Ven / 10:00 – 18:00"
+    },
+    "wishlist": {
+      "title": "Ma liste de souhaits",
+      "empty": "Votre liste de souhaits est vide",
+      "clear": "Vider la liste",
+      "confirm_clear": "Tout supprimer ?",
+      "go_shopping": "Voir les produits"
+    }
+  },
+  "forms": {
+    "name": "Nom",
+    "email": "E-mail",
+    "message": "Message",
+    "send": "Envoyer le message",
+    "success": "Merci ! Votre message a été envoyé."
+  }
+}

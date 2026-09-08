@@ -1,35 +1,265 @@
-{% comment %}
-  This section is used in the blog template to render the blog page listing all
-  articles within a blog.
+{%- assign sid = section.id -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/blog
-{% endcomment %}
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
 
-<h1>{{ blog.title }}</h1>
+  assign is_design_mode = request.design_mode
+-%}
 
-{% paginate blog.articles by 5 %}
-  {% for article in blog.articles %}
-    <div>
-      {% if article.image %}
-        {{ article.image | image_url: width: 1000 | image_tag }}
+<section id="blog-section-{{ sid }}" class="blog-section section page-width" data-component="blog-section">
+  {% if blog.title != blank %}
+    <h1 class="blog-section__title">{{ blog.title }}</h1>
+  {% endif %}
+
+  {% paginate blog.articles by section.settings.articles_per_page %}
+    <div class="blog-section__grid">
+      {% if blog.articles.size > 0 %}
+        {% for article in blog.articles %}
+          <article class="blog-card">
+            {% if article.image %}
+              <a href="{{ article.url }}" class="blog-card__image-link">
+                {% render 'image',
+                  image: article.image,
+                  width: 800,
+                  class: 'blog-card__image'
+                %}
+              </a>
+            {% endif %}
+
+            <div class="blog-card__content">
+              <h2 class="blog-card__title">
+                <a href="{{ article.url }}">
+                  {{ article.title | escape }}
+                </a>
+              </h2>
+
+              {%- liquid
+                assign date = article.published_at | time_tag: format: 'date'
+              -%}
+              <p class="blog-card__meta">
+                {{ 'blog.article_metadata_html' | t: date: date, author: article.author | default: 'Admin' }}
+              </p>
+
+              <p class="blog-card__excerpt">
+                {{ article.excerpt | default: article.content | strip_html | truncatewords: 25 }}
+              </p>
+            </div>
+          </article>
+        {% endfor %}
+      {% elsif is_design_mode %}
+        {% for i in (1..3) %}
+          <article class="blog-card">
+            <div class="blog-card__image-link">
+              {% assign placeholder_num = i | modulo: 2 | plus: 1 %}
+              {{ 'lifestyle-' | append: placeholder_num | placeholder_svg_tag: 'blog-card__placeholder placeholder-svg' }}
+            </div>
+            <div class="blog-card__content">
+              <h2 class="blog-card__title">
+                <a href="#">Example Blog Article Title {{ i }}</a>
+              </h2>
+              <p class="blog-card__meta">Jan 01, 2026 by Author</p>
+              <p class="blog-card__excerpt">
+                Give your customers a summary of your blog post and invite them to read more...
+              </p>
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p class="blog-section__empty">{{ 'blog.empty' | t | default: 'No articles found in this blog.' }}</p>
       {% endif %}
-      <h2>
-        {{ article.title | link_to: article.url }}
-      </h2>
-      {% assign date = article.published_at | time_tag: format: 'date' %}
-      <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-      <p>{{ article.excerpt }}</p>
     </div>
-  {% endfor %}
 
-  {%- if paginate.pages > 1 -%}
-    {{- paginate | default_pagination -}}
-  {%- endif -%}
-{% endpaginate %}
+    {%- if paginate.pages > 1 -%}
+      <div class="blog-pagination">
+        {{ paginate | default_pagination }}
+      </div>
+    {%- endif -%}
+  {% endpaginate %}
+</section>
+
+{% style %}
+#blog-section-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#blog-section-{{ sid }} .blog-section__title {
+  margin: 0 0 var(--space-lg);
+  font-size: var(--heading-lg, 32px);
+  font-weight: var(--font-weight-bold, 700);
+}
+
+#blog-section-{{ sid }} .blog-section__grid {
+  display: grid;
+  grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+  gap: var(--space-lg, 32px);
+}
+
+#blog-section-{{ sid }} .blog-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+#blog-section-{{ sid }} .blog-card__image-link {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  aspect-ratio: 16 / 10;
+}
+
+#blog-section-{{ sid }} .blog-card__image-link img,
+#blog-section-{{ sid }} .blog-card__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-fast);
+}
+
+#blog-section-{{ sid }} .blog-card__image-link:hover img {
+  transform: scale(1.03);
+}
+
+#blog-section-{{ sid }} .blog-card__title {
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--heading-sm, 20px);
+  line-height: 1.3;
+}
+
+#blog-section-{{ sid }} .blog-card__title a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+#blog-section-{{ sid }} .blog-card__title a:hover {
+  color: var(--color-accent);
+}
+
+#blog-section-{{ sid }} .blog-card__meta {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-muted);
+}
+
+#blog-section-{{ sid }} .blog-card__excerpt {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+#blog-section-{{ sid }} .blog-pagination {
+  margin-top: var(--space-xl);
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 990px) {
+  #blog-section-{{ sid }} .blog-section__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  #blog-section-{{ sid }} .blog-section__grid {
+    grid-template-columns: 1fr;
+  }
+
+  #blog-section-{{ sid }} .blog-section__title {
+    font-size: var(--heading-sm);
+  }
+}
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.blog",
-  "settings": []
+  "name": "Blog Posts",
+  "tag": "section",
+  "class": "section-blog",
+  "settings": [
+    {
+      "type": "range",
+      "id": "articles_per_page",
+      "label": "Articles per page",
+      "min": 3,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columns on desktop",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog Posts",
+      "settings": {
+        "articles_per_page": 6,
+        "columns_desktop": 3,
+        "color_mode": "theme",
+        "bg_color": "#FFFFFF",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    }
+  ]
 }
 {% endschema %}

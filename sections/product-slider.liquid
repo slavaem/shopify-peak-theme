@@ -1,0 +1,335 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign t_prev_slide     = 'sections.product_slider.prev_slide' | t
+  assign t_next_slide     = 'sections.product_slider.next_slide' | t
+-%}
+
+<section id="product-slider-{{ sid }}" class="product-slider" data-component="product-slider">
+  <div class="page-width">
+
+    <div
+      class="splide product-slider__container"
+      aria-labelledby="product-title-{{ sid }}"
+      data-element="splide"
+    >
+
+      {% if section.settings.title != blank or section.settings.show_arrows %}
+        <div class="product-slider__header">
+          {% if section.settings.title != blank %}
+            <h2 class="product-slider__title" id="product-title-{{ sid }}">
+              {{ section.settings.title }}
+            </h2>
+          {% endif %}
+
+          {% if section.settings.show_arrows %}
+            <div class="splide__arrows product-slider__arrows">
+              <button
+                class="splide__arrow splide__arrow--prev"
+                type="button"
+                aria-label="{{ t_prev_slide }}"
+              >
+                ←
+              </button>
+
+              <button
+                class="splide__arrow splide__arrow--next"
+                type="button"
+                aria-label="{{ t_next_slide }}"
+              >
+                →
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="splide__track">
+        <ul class="splide__list">
+          {% if section.settings.collection != blank and section.settings.collection.products.size > 0 %}
+            {% for product in section.settings.collection.products limit: section.settings.products_limit %}
+              <li class="splide__slide">
+                {% render 'product-card', product_item: product %}
+              </li>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..4) %}
+              <li class="splide__slide">
+                <div class="product-slider__placeholder-card">
+                  {% assign icon_name = 'product-apparel-' | append: i %}
+                  {{ icon_name | placeholder_svg_tag: 'placeholder-svg' }}
+                  <div class="placeholder-card__info">
+                    <p class="placeholder-card__title">Example Product {{ i }}</p>
+                    <p class="placeholder-card__price">$99.00</p>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% style %}
+#product-slider-{{ sid }} {
+  background:
+    {% if section.settings.color_mode == 'custom' %}
+      {{ section.settings.bg_color }}
+    {% else %}
+      var(--color-background)
+    {% endif %};
+
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#product-slider-{{ sid }} .product-slider__container {
+  container-type: inline-size;
+  container-name: product_slider;
+}
+
+#product-slider-{{ sid }} .product-slider__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+#product-slider-{{ sid }} .product-slider__title {
+  font-size: var(--heading-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  margin: 0;
+}
+
+#product-slider-{{ sid }} .product-slider__arrows {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+#product-slider-{{ sid }} .splide__arrow {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  transition: var(--transition-fast);
+  position: inherit;
+}
+
+#product-slider-{{ sid }} .splide__arrow:hover {
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+
+#product-slider-{{ sid }} .splide__track {
+  cursor: grab;
+}
+
+#product-slider-{{ sid }} .splide__track:active,
+#product-slider-{{ sid }} .splide.is-active .splide__track {
+  cursor: grabbing;
+}
+
+#product-slider-{{ sid }} .product-slider__placeholder-card {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background: var(--color-surface-subtle);
+  text-align: center;
+}
+
+#product-slider-{{ sid }} .placeholder-card__info {
+  margin-top: var(--space-xs);
+}
+
+#product-slider-{{ sid }} .placeholder-card__title {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 4px 0;
+}
+
+#product-slider-{{ sid }} .placeholder-card__price {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+@container product_slider (max-width: 767px) {
+  #product-slider-{{ sid }} .product-slider__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #product-slider-{{ sid }} .product-slider__arrows {
+    display: none;
+  }
+}
+{% endstyle %}
+
+<script>
+(function () {
+
+  function initProductSlider() {
+    const root = document.querySelector('#product-slider-{{ sid }}[data-component="product-slider"]');
+    if (!root) return;
+
+    const el = root.querySelector('[data-element="splide"]');
+    if (!el) return;
+    if (el.classList.contains('is-initialized')) return;
+    if (typeof Splide === 'undefined') return;
+
+    const splide = new Splide(el, {
+      type: 'loop',
+      perPage: {{ section.settings.slides_desktop }},
+      perMove: 1,
+      gap: '30px',
+      pagination: false,
+      arrows: Boolean({{ section.settings.show_arrows }}),
+      drag: true,      
+      snap: true,
+      autoplay: Boolean({{ section.settings.autoplay }}),
+      interval: 4000,
+      pauseOnHover: true,
+      pauseOnFocus: true,
+      resetProgress: false,
+      breakpoints: {
+        1200: { perPage: 3 },
+        990:  { perPage: 2, gap: '20px' },
+        600:  { perPage: 1 }
+      }
+    });
+
+    if (Boolean({{ section.settings.autoplay }})) {
+      splide.on('moved', () => {
+        splide.Components.Autoplay?.play();
+      });
+    }
+
+    splide.mount();
+    el.classList.add('is-initialized');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProductSlider);
+  } else {
+    initProductSlider();
+  }
+
+  document.addEventListener('shopify:section:load', (e) => {
+    if (e.target.id.includes('{{ sid }}')) initProductSlider();
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Product Collection Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Our Highlights"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Limit",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "slides_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Products per row",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme default"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#F9F9F9"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Collection Slider",
+      "settings": {
+        "title": "Our Highlights",
+        "products_limit": 8,
+        "slides_desktop": 4,
+        "show_arrows": true,
+        "autoplay": true,
+        "color_mode": "theme",
+        "bg_color": "#F9F9F9",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  ]
+}
+{% endschema %}

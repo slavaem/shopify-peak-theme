@@ -1,0 +1,271 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+
+  assign default_title = 'sections.reviews.title' | t
+  assign default_subtitle = 'sections.reviews.subtitle' | t
+  assign default_cta = 'sections.reviews.cta' | t
+-%}
+
+<section id="reviews-{{ sid }}" class="reviews section page-width" data-component="reviews">
+  <div class="reviews__container">
+
+    <div class="reviews__header">
+      <h2 class="reviews__title">
+        {{ section.settings.title | default: default_title | escape }}
+      </h2>
+      <p class="reviews__subtitle">
+        {{ section.settings.subtitle | default: default_subtitle | escape }}
+      </p>
+      
+      {% if section.settings.global_rating != blank %}
+        <div class="reviews__global-rating">
+          {{ 'sections.reviews.rating_label' | t: rating: section.settings.global_rating | escape }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="reviews__grid">
+      {% for block in section.blocks %}
+        <div class="review-card" {{ block.shopify_attributes }}>
+          <div
+            class="review-card__stars"
+            role="img"
+            aria-label="{{ 'sections.reviews.rating_label' | t: rating: block.settings.rating | default: block.settings.rating }}"
+          >
+            {%- for i in (1..5) -%}
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="{% if i <= block.settings.rating %}var(--color-rating, #ffb800){% else %}var(--color-border-light, #e2e2e2){% endif %}">
+                <path d="M12 .587l3.668 7.431 8.332 1.21-6.001 5.85 1.416 8.297-7.415-3.897-7.415 3.897 1.416-8.297-6.001-5.85 8.332-1.21z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+
+          <p class="review-card__text">
+            "{{ block.settings.text | default: 'Customer review text will appear here...' | escape }}"
+          </p>
+
+          <div class="review-card__author">
+            <strong>{{ block.settings.name | default: 'Customer Name' | escape }}</strong>
+            {% if block.settings.location != blank %}
+              <span class="review-card__location"> &mdash; {{ block.settings.location | escape }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if section.settings.show_cta and section.settings.cta_link != blank %}
+      <div class="reviews__footer">
+        <a href="{{ section.settings.cta_link }}" class="btn btn--secondary">
+          {{ section.settings.cta_label | default: default_cta | escape }}
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% style %}
+#reviews-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#reviews-{{ sid }} .reviews__header {
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+#reviews-{{ sid }} .reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-md);
+}
+
+#reviews-{{ sid }} .review-card {
+  background: var(--color-surface);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#reviews-{{ sid }} .review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+#reviews-{{ sid }} .review-card__stars {
+  display: flex;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-md);
+}
+
+#reviews-{{ sid }} .review-card__stars svg {
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
+}
+
+#reviews-{{ sid }} .review-card__text {
+  font-style: italic;
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+}
+
+#reviews-{{ sid }} .review-card__author {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+#reviews-{{ sid }} .reviews__footer {
+  text-align: center;
+  margin-top: var(--space-xl);
+}
+
+@media screen and (max-width: 480px) {
+  #reviews-{{ sid }} .reviews__grid {
+    grid-template-columns: 1fr;
+  }
+  #reviews-{{ sid }} .review-card {
+    padding: var(--space-lg);
+  }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Reviews",
+  "tag": "section",
+  "class": "section-reviews",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "What our customers say"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Real reviews from real people."
+    },
+    {
+      "type": "text",
+      "id": "global_rating",
+      "label": "Global rating",
+      "default": "4.8",
+      "info": "Displayed near the section title"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show CTA button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Read all reviews"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme Default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review text",
+          "default": "Amazing quality and fast delivery. Highly recommended."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Customer name",
+          "default": "Customer Name"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location",
+          "default": "New York, USA"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reviews",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}

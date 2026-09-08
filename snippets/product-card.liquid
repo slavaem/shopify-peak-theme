@@ -1,0 +1,118 @@
+{% doc %}
+  Product Card
+
+  Renders a standard product grid card with pricing, badges, and quick actions.
+
+  Usage:
+    {% render 'product-card', product: product %}
+
+  Parameters:
+    @param {object} [product] - Shopify Product object
+    @param {object} [product_item] - Alternative parameter name for Product object
+{% enddoc %}
+
+{%- liquid 
+  assign card_product = product | default: product_item
+  assign current_variant = card_product.selected_or_first_available_variant 
+  
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+
+  assign t_add_to_cart     = 'products.product.add_to_cart' | t | default: 'Add to cart'
+  assign t_add_to_wishlist = 'products.product.add_to_wishlist' | t | default: 'Add to wishlist'
+  assign t_title_fallback  = 'products.product.product_fallback' | t | default: 'Example Product'
+  assign t_sold_out        = 'products.product.sold_out' | t | default: 'Sold out'
+-%}
+
+<div class="product-card js-product-item" data-product-card>
+  <div class="card-inner">
+    <div class="image-wrapper-container">
+      <a 
+        href="{{ card_product.url | default: '#' }}" 
+        class="image-wrapper" 
+        aria-label="{{ card_product.title | default: t_title_fallback | escape }}"
+      >
+        {% if card_product != blank and card_product.featured_image != blank %}
+          {% render 'image',
+            image: card_product.featured_image,
+            width: 600,
+            widths: '300, 600, 900',
+            sizes: '(max-width: 767px) 300px, 600px',
+            wrapper_class: 'img-cover',
+            loading: 'lazy',
+            alt: card_product.featured_image.alt | default: card_product.title | escape
+          %}
+        {% else %}
+          <div class="placeholder-wrapper">
+            {{ 'product-apparel-1' | placeholder_svg_tag: 'img-cover placeholder-svg' }}
+          </div>
+        {% endif %}
+      </a>
+
+      {% if on_sale and current_variant.compare_at_price > 0 %}
+        <span class="badge badge--sale">
+          -{{ current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price }}%
+        </span>
+      {% elsif current_variant.available == false %}
+        <span class="badge badge--sold-out">
+          {{ t_sold_out }}
+        </span>
+      {% endif %}
+
+      <div class="actions-overlay">
+        <button 
+          type="button" 
+          class="icon-btn js-wishlist-btn"
+          data-action="wishlist-toggle"
+          data-id="{{ current_variant.id }}"
+          data-handle="{{ card_product.handle }}"
+          aria-label="{{ t_add_to_wishlist }}"
+          data-title="{{ card_product.title | escape }}"
+        >
+          <span class="icon-heart" aria-hidden="true">♥</span>
+        </button>
+        
+        <button 
+          type="button" 
+          class="icon-btn js-atc-btn" 
+          data-action="cart-add"
+          data-variant-id="{{ current_variant.id }}"
+          data-title="{{ card_product.title | escape }}"
+          aria-label="{{ t_add_to_cart }}"
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span class="icon-cart" aria-hidden="true">🛒</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card-info">
+      <div class="info-row">
+        <div class="info-text">
+          <a href="{{ card_product.url | default: '#' }}" class="product-title">
+            {{ card_product.title | default: t_title_fallback | escape }}
+          </a>
+          
+          {% if settings.show_vendor and card_product.vendor != blank %}
+            <div class="product-vendor">{{ card_product.vendor | escape }}</div>
+          {% endif %}
+        </div>
+
+        <div class="info-price">
+          <span class="product-price">
+            {% if card_product != blank %}
+              {{ current_variant.price | money }}
+            {% else %}
+              $99.00
+            {% endif %}
+          </span>
+          {% if on_sale %}
+            <s class="compare-price">{{ current_variant.compare_at_price | money }}</s>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

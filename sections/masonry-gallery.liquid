@@ -1,0 +1,502 @@
+{%- assign sid = section.id | replace: '-', '_' -%}
+
+{%- liquid
+  assign is_design_mode = request.design_mode
+
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+-%}
+
+<section 
+  id="masonry-{{ sid }}" 
+  class="masonry-section section" 
+  data-component="masonry-gallery"
+>
+  <div class="page-width">
+    {% if section.settings.title != blank %}
+      {% render 'builder-heading', 
+        block: section, 
+        title: section.settings.title, 
+        tag: 'h2', 
+        alignment: 'center' 
+      %}
+    {% endif %}
+
+    <div class="masonry-grid">
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'product' %}
+              {% assign product = block.settings.product %}
+              {% assign m_image = block.settings.image | default: product.featured_image %}
+              
+              {% if product != blank or is_design_mode %}
+                <div class="masonry-item" {{ block.shopify_attributes }}>
+                  {% assign v = product.selected_or_first_available_variant %}
+                  <div class="masonry-card"
+                    data-action="quick-view-open"
+                    data-id="{{ v.id | default: 123456 }}"
+                    data-title="{{ product.title | default: 'Example Product Title' | escape }}"
+                    data-price="{{ product.price | default: 9900 | money }}"
+                    data-img="{% if m_image %}{{ m_image | image_url: width: 800 }}{% endif %}"
+                    data-desc="{{ product.description | default: 'Example product description text for quick view modal window.' | strip_html | truncatewords: 20 | escape }}"
+                    data-url="{{ product.url | default: '#' }}"
+                  >
+
+                    {% if m_image %}
+                      {% render 'image',
+                        image: m_image,
+                        width: 800,
+                        wrapper_class: 'masonry-img-wrapper',
+                        loading: 'lazy'
+                      %}
+                    {% else %}
+                      <div class="masonry-placeholder">
+                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                      </div>
+                    {% endif %}
+
+                    <div class="masonry-overlay">
+                      <span>{{ 'sections.masonry_gallery.quick_view' | t | default: 'Quick View' }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+            {% when 'image' %}
+              {% assign m_image = block.settings.image %}
+              {% if m_image != blank or is_design_mode %}
+                <div class="masonry-item" {{ block.shopify_attributes }}>
+                  <div class="masonry-card masonry-static">
+                    {% if m_image %}
+                      {% render 'image',
+                        image: m_image,
+                        width: 800,
+                        wrapper_class: 'masonry-img-wrapper',
+                        loading: 'lazy'
+                      %}
+                    {% else %}
+                      <div class="masonry-placeholder">
+                        {{ 'collection-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+          {% endcase %}
+        {% endfor %}
+
+      {% elsif is_design_mode %}
+        {% for i in (1..4) %}
+          <div class="masonry-item">
+            <div class="masonry-card masonry-static">
+              <div class="masonry-placeholder">
+                {{ 'collection-apparel-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- QUICK VIEW MODAL DIALOG -->
+    <dialog class="quickview-modal" data-element="quickview-modal" id="Modal-{{ sid }}">
+      <button type="button" class="modal-close" data-action="modal-close" aria-label="{{ 'accessibility.close' | t | default: 'Close' }}">
+        &times;
+      </button>
+      <div class="modal-body">
+        <img class="modal-img" data-element="modal-image" src="" alt="Quick View Product Image" width="800" height="800">
+        <h3 class="modal-title" data-element="modal-title"></h3>
+        <p class="modal-price" data-element="modal-price"></p>
+        <p class="modal-desc" data-element="modal-description"></p>
+        <button class="btn btn--primary" data-action="quick-view-add">
+          {{ 'sections.masonry_gallery.add_to_cart' | t | default: 'Add to Cart' }}
+        </button>
+        <a class="modal-link" data-element="modal-link">
+          {{ 'sections.masonry_gallery.full_details' | t | default: 'Full Details' }} &rarr;
+        </a>
+      </div>
+    </dialog>
+  </div>
+</section>
+
+{% style %}
+#masonry-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#masonry-{{ sid }} .masonry-grid { 
+  column-count: {{ section.settings.columns_desktop }}; 
+  column-gap: var(--space-md); 
+  margin-top: var(--space-lg);
+}
+
+#masonry-{{ sid }} .masonry-item {
+  break-inside: avoid; 
+  margin-bottom: var(--space-md); 
+}
+
+#masonry-{{ sid }} .masonry-card { 
+  position: relative; 
+  cursor: pointer;
+  overflow: hidden; 
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle); 
+}
+
+#masonry-{{ sid }} .masonry-static {
+  cursor: default;
+}
+
+#masonry-{{ sid }} .masonry-img-wrapper,
+#masonry-{{ sid }} .masonry-img-wrapper .image__img,
+#masonry-{{ sid }} .masonry-placeholder svg { 
+  width: 100%; 
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+#masonry-{{ sid }} .masonry-card img {
+  transition: transform var(--transition-base, 0.4s ease);
+  backface-visibility: hidden; 
+}
+
+#masonry-{{ sid }} .masonry-card:not(.masonry-static):hover img {
+  transform: scale(1.04);
+}
+
+#masonry-{{ sid }} .masonry-card:not(.masonry-static):hover .masonry-overlay {
+  opacity: 1;
+}
+
+#masonry-{{ sid }} .masonry-overlay {
+  position: absolute; 
+  inset: 0; 
+  display: grid; 
+  place-items: center;
+  background: var(--color-overlay, rgba(0,0,0,0.4)); 
+  color: var(--color-background, #ffffff); 
+  opacity: 0; 
+  transition: opacity var(--transition-fast, 0.2s ease);
+  z-index: 2;
+  font-weight: var(--font-weight-medium, 500);
+}  
+
+#masonry-{{ sid }} .quickview-modal {
+  width: min(550px, 90vw);
+  max-height: 90vh;
+  margin: auto;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+}
+
+#masonry-{{ sid }} .quickview-modal::backdrop {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+}
+
+#masonry-{{ sid }} .modal-body {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+#masonry-{{ sid }} .modal-title {
+  font-family: var(--font-family-heading);
+  font-size: var(--heading-sm);
+  margin: 0;
+}
+
+#masonry-{{ sid }} .modal-price {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+#masonry-{{ sid }} .modal-desc {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-base);
+  margin: 0;
+}
+
+#masonry-{{ sid }} .modal-close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full, 50%);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  z-index: 10;
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast);
+}
+
+#masonry-{{ sid }} .modal-close:hover {
+  background: var(--color-surface-subtle);
+}
+
+#masonry-{{ sid }} .modal-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  max-height: 45vh;
+  object-fit: contain;
+  background: var(--color-surface-subtle);
+}
+
+#masonry-{{ sid }} .modal-link {
+  font-size: var(--text-small);
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+#masonry-{{ sid }} [data-action="quick-view-add"].loading { 
+  opacity: .6; 
+  pointer-events: none; 
+}
+
+@supports (grid-template-rows: masonry) {
+  #masonry-{{ sid }} .masonry-grid {
+    display: grid;
+    column-count: unset;
+    column-gap: unset;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    grid-template-rows: masonry;
+    gap: var(--space-md);
+  }
+  #masonry-{{ sid }} .masonry-item {
+    break-inside: unset;
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  #masonry-{{ sid }} .masonry-grid { column-count: {{ section.settings.columns_mobile }}; }
+
+  #masonry-{{ sid }} .quickview-modal {
+    width: calc(100vw - (var(--page-margin, 16px) * 2));
+  }
+
+  #masonry-{{ sid }} .modal-body {
+    padding: var(--space-md);
+  }
+
+  @supports (grid-template-rows: masonry) {
+    #masonry-{{ sid }} .masonry-grid {
+      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    }
+  }
+}
+{% endstyle %}
+
+<script>
+(() => {
+  const root = document.getElementById('masonry-{{ sid }}');
+  if (!root) return;
+
+  const modal = root.querySelector('[data-element="quickview-modal"]');
+  if (!modal) return;
+
+  const modalImg = modal.querySelector('[data-element="modal-image"]');
+  const modalTitle = modal.querySelector('[data-element="modal-title"]');
+  const modalPrice = modal.querySelector('[data-element="modal-price"]');
+  const modalDesc = modal.querySelector('[data-element="modal-description"]');
+  const modalLink = modal.querySelector('[data-element="modal-link"]');
+  const atcBtn = modal.querySelector('[data-action="quick-view-add"]');
+
+  /* OPEN QUICK VIEW */
+  root.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-action="quick-view-open"]');
+    if (!card) return;
+
+    if (modalImg && card.dataset.img) modalImg.src = card.dataset.img;
+    if (modalTitle) modalTitle.textContent = card.dataset.title;
+    if (modalPrice) modalPrice.textContent = card.dataset.price;
+    if (modalDesc) modalDesc.textContent = card.dataset.desc;
+    if (modalLink) modalLink.href = card.dataset.url;
+    if (atcBtn) atcBtn.dataset.id = card.dataset.id;
+
+    modal.showModal();
+  });
+
+  /* CLOSE MODAL */
+  modal.addEventListener('click', (e) => {
+    if (
+      e.target === modal ||
+      e.target.closest('[data-action="modal-close"]')
+    ) {
+      modal.close();
+    }
+  });
+
+  /* ADD TO CART */
+  if (atcBtn) {
+    atcBtn.addEventListener('click', async () => {
+      if (atcBtn.classList.contains('loading')) return;
+
+      const id = Number(atcBtn.dataset.id);
+      if (!id) return;
+
+      atcBtn.classList.add('loading');
+
+      try {
+        const res = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: [{ id, quantity: 1 }]
+          })
+        });
+
+        if (!res.ok) throw new Error('Add to cart failed');
+
+        const addedItem = await res.json();
+        modal.close();
+
+        // Trigger global cart update and open toast notification
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: addedItem }));
+
+      } catch (err) {
+        console.error(err);
+      } finally {
+        atcBtn.classList.remove('loading');
+      }
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Masonry Gallery",
+  "tag": "section",
+  "class": "section-masonry-gallery",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story in Pictures"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Mobile Columns",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Spacing"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#F9F9F9"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "image_picker", "id": "image", "label": "Override image" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Masonry Gallery",
+      "settings": {
+        "title": "Our Story in Pictures",
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_mode": "theme",
+        "bg_color": "#F9F9F9",
+        "padding_top": 80,
+        "padding_bottom": 80
+      },
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

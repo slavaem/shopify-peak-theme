@@ -1,0 +1,115 @@
+{% doc %}
+  Confirm Modal
+
+  Renders a reusable modal dialog with cancel and confirm action buttons.
+
+  Usage:
+    {% render 'confirm-modal',
+      id: 'clear-cart-modal',
+      title: 'Clear Cart?',
+      text: 'Are you sure you want to remove all items from your cart?',
+      btn_text: 'Yes, Clear'
+    %}
+
+  Parameters:
+    @param {string} id - Unique ID for the dialog element (Required)
+    @param {string} [title] - Modal title
+    @param {string} [text] - Modal description/body text
+    @param {string} [btn_text] - Confirmation button label
+{% enddoc %}
+
+{%- liquid
+  assign modal_id = id | default: 'confirm-modal'
+  assign modal_title = title | escape
+  assign modal_text = text | escape
+  assign confirm_label = btn_text | default: 'general.confirm' | t | default: 'Confirm'
+  assign cancel_label = 'general.cancel' | t | default: 'Cancel'
+-%}
+
+<dialog id="{{ modal_id }}" class="custom-modal">
+  <div class="custom-modal__content">
+    {% if modal_title != blank %}
+      <h3 class="custom-modal__title">{{ modal_title }}</h3>
+    {% endif %}
+
+    {% if modal_text != blank %}
+      <p class="custom-modal__text">{{ modal_text }}</p>
+    {% endif %}
+
+    <div class="custom-modal__actions">
+      <button 
+        type="button" 
+        class="btn btn--secondary" 
+        onclick="this.closest('dialog').close()"
+      >
+        {{ cancel_label }}
+      </button>
+
+      <button 
+        type="button" 
+        class="btn btn--primary" 
+        id="{{ modal_id }}-confirm-btn"
+      >
+        {{ confirm_label }}
+      </button>
+    </div>
+  </div>
+</dialog>
+
+{% style %}
+.custom-modal {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  box-shadow: var(--shadow-lg, 0 15px 35px rgba(0, 0, 0, 0.25));
+  max-width: 400px;
+  width: calc(100% - (var(--page-margin) * 2));
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  outline: none;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.custom-modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+.custom-modal__content {
+  padding: var(--space-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.custom-modal__title {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: var(--heading-sm, var(--font-size-md));
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-heading);
+}
+
+.custom-modal__text {
+  margin: 0;
+  font-family: var(--font-family-body);
+  color: var(--color-text-muted, var(--color-text-secondary));
+  font-size: var(--text-small, var(--font-size-sm));
+  line-height: var(--line-height-base);
+}
+
+.custom-modal__actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-top: var(--space-md);
+}
+
+.custom-modal__actions .btn {
+  flex: 1;
+}
+{% endstyle %}

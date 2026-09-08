@@ -1,0 +1,605 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign t_prev_slide = 'sections.banner_slider.prev_slide' | t | default: 'Previous slide'
+  assign t_next_slide = 'sections.banner_slider.next_slide' | t | default: 'Next slide'
+-%}
+
+<section id="banner-slider-{{ sid }}" class="banner-slider" data-component="banner-slider">
+  <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %}">
+
+    <div
+      class="splide banner-slider__container"
+      aria-label="{{ section.settings.accessibility_label | default: 'Promo Carousel' }}"
+      data-element="splide"
+    >
+
+      {% if section.settings.title != blank or section.settings.show_arrows %}
+        <div class="banner-slider__header">
+          {% if section.settings.title != blank %}
+            <h2 class="banner-slider__title" id="banner-title-{{ sid }}">
+              {{ section.settings.title }}
+            </h2>
+          {% endif %}
+
+          {% if section.settings.show_arrows and section.blocks.size > 1 %}
+            <div class="splide__arrows banner-slider__arrows">
+              <button
+                class="splide__arrow splide__arrow--prev"
+                type="button"
+                aria-label="{{ t_prev_slide }}"
+              >
+                &larr;
+              </button>
+
+              <button
+                class="splide__arrow splide__arrow--next"
+                type="button"
+                aria-label="{{ t_next_slide }}"
+              >
+                &rarr;
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="splide__track">
+        <ul class="splide__list">
+          {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+              {% liquid
+                assign overlay_opacity = block.settings.overlay_opacity | divided_by: 100.0
+              %}
+              <li class="splide__slide" {{ block.shopify_attributes }}>
+                <div 
+                  class="banner-slider__slide-item banner-slider__slide-item--align-{{ block.settings.text_alignment }}"
+                  style="
+                    --slide-height: {{ section.settings.slide_height }}px;
+                    --slide-overlay-opacity: {{ overlay_opacity }};
+                    --slide-text-color: {{ block.settings.text_color }};
+                  "
+                >
+                  <!-- BACKGROUND MEDIA -->
+                  <div class="banner-slider__media-wrapper">
+                    {% if block.settings.video_url != blank %}
+                      <video 
+                        class="banner-slider__media" 
+                        autoplay 
+                        loop 
+                        muted 
+                        playsinline
+                        poster="{{ block.settings.image | image_url: width: 1600 }}"
+                      >
+                        <source src="{{ block.settings.video_url }}" type="video/mp4">
+                      </video>
+                    {% elsif block.settings.image != blank %}
+                      <img
+                        src="{{ block.settings.image | image_url: width: 1800 }}"
+                        alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                        class="banner-slider__media"
+                        loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                        width="{{ block.settings.image.width }}"
+                        height="{{ block.settings.image.height }}"
+                      >
+                    {% else %}
+                      {% assign placeholder_num = forloop.index | modulo: 2 | plus: 1 %}
+                      {{ 'lifestyle-' | append: placeholder_num | placeholder_svg_tag: 'banner-slider__media placeholder-svg' }}
+                    {% endif %}
+                    <div class="banner-slider__overlay"></div>
+                  </div>
+
+                  <!-- CONTENT OVERLAY -->
+                  <div class="banner-slider__content-wrapper">
+                    <div class="banner-slider__content">
+                      {% if block.settings.subheading != blank %}
+                        <span class="banner-slider__subheading">{{ block.settings.subheading }}</span>
+                      {% endif %}
+
+                      {% if block.settings.heading != blank %}
+                        <h3 class="banner-slider__heading">{{ block.settings.heading }}</h3>
+                      {% endif %}
+
+                      {% if block.settings.text != blank %}
+                        <div class="banner-slider__text">{{ block.settings.text }}</div>
+                      {% endif %}
+
+                      {% if block.settings.button_1_label != blank or block.settings.button_2_label != blank %}
+                        <div class="banner-slider__buttons">
+                          {% if block.settings.button_1_label != blank %}
+                            <a 
+                              href="{{ block.settings.button_1_link | default: '#' }}" 
+                              class="btn btn--primary"
+                            >
+                              {{ block.settings.button_1_label }}
+                            </a>
+                          {% endif %}
+
+                          {% if block.settings.button_2_label != blank %}
+                            <a 
+                              href="{{ block.settings.button_2_link | default: '#' }}" 
+                              class="banner-slider__btn-secondary"
+                            >
+                              {{ block.settings.button_2_label }}
+                            </a>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                </div>
+              </li>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..2) %}
+              <li class="splide__slide">
+                <div 
+                  class="banner-slider__slide-item banner-slider__slide-item--align-center"
+                  style="
+                    --slide-height: {{ section.settings.slide_height }}px;
+                    --slide-overlay-opacity: 0.3;
+                    --slide-text-color: #ffffff;
+                  "
+                >
+                  <div class="banner-slider__media-wrapper">
+                    {{ 'lifestyle-' | append: i | placeholder_svg_tag: 'banner-slider__media placeholder-svg' }}
+                    <div class="banner-slider__overlay"></div>
+                  </div>
+                  <div class="banner-slider__content-wrapper">
+                    <div class="banner-slider__content">
+                      <span class="banner-slider__subheading">Promo Banner {{ i }}</span>
+                      <h3 class="banner-slider__heading">Crafted to last. Designed to be simple.</h3>
+                      <div class="banner-slider__text"><p>Add slides in section settings to customize banners, videos, and CTA buttons.</p></div>
+                      <div class="banner-slider__buttons">
+                        <a href="#" class="btn btn--primary">Shop Collection</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% style %}
+#banner-slider-{{ sid }} {
+  background:
+    {% if section.settings.color_mode == 'custom' %}
+      {{ section.settings.bg_color }}
+    {% else %}
+      var(--color-background)
+    {% endif %};
+
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#banner-slider-{{ sid }} .banner-slider__container {
+  container-type: inline-size;
+  container-name: banner_slider;
+}
+
+#banner-slider-{{ sid }} .banner-slider__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+#banner-slider-{{ sid }} .banner-slider__title {
+  font-size: var(--heading-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  margin: 0;
+}
+
+#banner-slider-{{ sid }} .banner-slider__arrows {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+#banner-slider-{{ sid }} .splide__arrow {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  transition: var(--transition-fast);
+  position: inherit;
+}
+
+#banner-slider-{{ sid }} .splide__arrow:hover {
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+
+#banner-slider-{{ sid }} .splide__track {
+  cursor: grab;
+}
+
+#banner-slider-{{ sid }} .splide__track:active,
+#banner-slider-{{ sid }} .splide.is-active .splide__track {
+  cursor: grabbing;
+}
+
+/* SLIDE ITEM STYLES */
+#banner-slider-{{ sid }} .banner-slider__slide-item {
+  position: relative;
+  width: 100%;
+  min-height: var(--slide-height, 500px);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+#banner-slider-{{ sid }} .banner-slider__media-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+#banner-slider-{{ sid }} .banner-slider__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#banner-slider-{{ sid }} .banner-slider__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, var(--slide-overlay-opacity, 0.3));
+  z-index: 1;
+}
+
+#banner-slider-{{ sid }} .banner-slider__content-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: var(--space-xl) var(--space-lg);
+  display: flex;
+}
+
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-left .banner-slider__content-wrapper { justify-content: flex-start; }
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-center .banner-slider__content-wrapper { justify-content: center; }
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-right .banner-slider__content-wrapper { justify-content: flex-end; }
+
+#banner-slider-{{ sid }} .banner-slider__content {
+  max-width: 600px;
+  color: var(--slide-text-color, #ffffff);
+  text-align: left;
+}
+
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-center .banner-slider__content { text-align: center; }
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-right .banner-slider__content { text-align: right; }
+
+#banner-slider-{{ sid }} .banner-slider__subheading {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-xs);
+  opacity: 0.9;
+}
+
+#banner-slider-{{ sid }} .banner-slider__heading {
+  font-family: var(--font-family-heading);
+  font-size: var(--hero-title, clamp(28px, 4vw, 44px));
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
+  margin: 0 0 var(--space-sm) 0;
+  color: inherit;
+}
+
+#banner-slider-{{ sid }} .banner-slider__text {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  margin-bottom: var(--space-md);
+  opacity: 0.95;
+}
+
+#banner-slider-{{ sid }} .banner-slider__buttons {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-center .banner-slider__buttons { justify-content: center; }
+#banner-slider-{{ sid }} .banner-slider__slide-item--align-right .banner-slider__buttons { justify-content: flex-end; }
+
+#banner-slider-{{ sid }} .banner-slider__btn-secondary {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-fast);
+}
+
+#banner-slider-{{ sid }} .banner-slider__btn-secondary:hover {
+  opacity: 0.8;
+}
+
+@container banner_slider (max-width: 767px) {
+  #banner-slider-{{ sid }} .banner-slider__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #banner-slider-{{ sid }} .banner-slider__arrows {
+    display: none;
+  }
+
+  #banner-slider-{{ sid }} .banner-slider__slide-item {
+    min-height: clamp(380px, 60vh, 500px);
+  }
+
+  #banner-slider-{{ sid }} .banner-slider__content-wrapper {
+    padding: var(--space-md);
+  }
+}
+{% endstyle %}
+
+<script>
+(function () {
+
+  function initBannerSlider() {
+    const root = document.querySelector('#banner-slider-{{ sid }}[data-component="banner-slider"]');
+    if (!root) return;
+
+    const el = root.querySelector('[data-element="splide"]');
+    if (!el) return;
+    if (el.classList.contains('is-initialized')) return;
+    if (typeof Splide === 'undefined') return;
+
+    const splide = new Splide(el, {
+      type: 'loop',
+      perPage: 1,
+      perMove: 1,
+      gap: '20px',
+      pagination: Boolean({{ section.settings.show_pagination }}),
+      arrows: Boolean({{ section.settings.show_arrows }}),
+      drag: true,      
+      snap: true,
+      autoplay: Boolean({{ section.settings.autoplay }}),
+      interval: {{ section.settings.autoplay_speed | times: 1000 }},
+      pauseOnHover: true,
+      pauseOnFocus: true,
+      resetProgress: false
+    });
+
+    if (Boolean({{ section.settings.autoplay }})) {
+      splide.on('moved', () => {
+        splide.Components.Autoplay?.play();
+      });
+    }
+
+    splide.mount();
+    el.classList.add('is-initialized');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBannerSlider);
+  } else {
+    initBannerSlider();
+  }
+
+  document.addEventListener('shopify:section:load', (e) => {
+    if (e.target.id.includes('{{ sid }}')) initBannerSlider();
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Banner Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title"
+    },
+    {
+      "type": "range",
+      "id": "slide_height",
+      "min": 350,
+      "max": 750,
+      "step": 50,
+      "unit": "px",
+      "label": "Slide Minimal Height",
+      "default": 500
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show dots pagination",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Autoplay speed",
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#F9F9F9"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Banner Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Direct MP4 Video URL",
+          "info": "Overrides image if specified."
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "label": "Dark Overlay Opacity",
+          "default": 30
+        },
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "label": "Text Alignment",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Limited Edition"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Crafted to last."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Description",
+          "default": "<p>A premium handcrafted collection made with attention to every detail.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_1_label",
+          "label": "Primary Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_1_link",
+          "label": "Primary Button Link"
+        },
+        {
+          "type": "text",
+          "id": "button_2_label",
+          "label": "Secondary Link Text"
+        },
+        {
+          "type": "url",
+          "id": "button_2_link",
+          "label": "Secondary Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner Slider",
+      "settings": {
+        "slide_height": 500,
+        "show_arrows": true,
+        "show_pagination": true,
+        "autoplay": true,
+        "autoplay_speed": 5
+      },
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "subheading": "New Arrival",
+            "heading": "Crafted to last. Designed to be simple.",
+            "text_alignment": "center",
+            "button_1_label": "Shop Now"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "subheading": "Special Offer",
+            "heading": "Attention to every detail.",
+            "text_alignment": "left",
+            "button_1_label": "Explore Collection"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

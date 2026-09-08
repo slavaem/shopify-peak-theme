@@ -1,0 +1,218 @@
+{% doc %}
+  Builder Features
+
+  Displays up to four feature cards with optional icons.
+
+  Usage:
+    {% render 'builder-features', block: block %}
+
+  Dependencies:
+    - snippets/image.liquid
+
+  Example Block Schema (Скопируй этот JSON в schema нужной секции в массив "blocks"):
+  {
+    "type": "features",
+    "name": "Features List",
+    "settings": [
+      {
+        "type": "select",
+        "id": "columns",
+        "label": "Columns",
+        "options": [
+          { "value": "auto", "label": "Auto Fit" },
+          { "value": "2", "label": "2 Columns" },
+          { "value": "3", "label": "3 Columns" },
+          { "value": "4", "label": "4 Columns" }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "select",
+        "id": "card_style",
+        "label": "Card Style",
+        "options": [
+          { "value": "background", "label": "Background" },
+          { "value": "border", "label": "Border" },
+          { "value": "plain", "label": "Plain" }
+        ],
+        "default": "background"
+      },
+      {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Text Alignment",
+        "options": [
+          { "value": "left", "label": "Left" },
+          { "value": "center", "label": "Center" }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_icons",
+        "label": "Show Icons",
+        "default": true
+      },
+      { "type": "header", "content": "Feature 1" },
+      { "type": "text", "id": "title_1", "label": "Title 1" },
+      { "type": "textarea", "id": "text_1", "label": "Text 1" },
+      { "type": "image_picker", "id": "icon_1", "label": "Icon 1" },
+      { "type": "header", "content": "Feature 2" },
+      { "type": "text", "id": "title_2", "label": "Title 2" },
+      { "type": "textarea", "id": "text_2", "label": "Text 2" },
+      { "type": "image_picker", "id": "icon_2", "label": "Icon 2" },
+      { "type": "header", "content": "Feature 3" },
+      { "type": "text", "id": "title_3", "label": "Title 3" },
+      { "type": "textarea", "id": "text_3", "label": "Text 3" },
+      { "type": "image_picker", "id": "icon_3", "label": "Icon 3" },
+      { "type": "header", "content": "Feature 4" },
+      { "type": "text", "id": "title_4", "label": "Title 4" },
+      { "type": "textarea", "id": "text_4", "label": "Text 4" },
+      { "type": "image_picker", "id": "icon_4", "label": "Icon 4" }
+    ]
+  }
+{% enddoc %}
+
+{%- assign has_features = false -%}
+
+{%- capture features_content -%}
+  {%- for i in (1..4) -%}
+    {%- assign t_key = 'title_' | append: i -%}
+    {%- assign p_key = 'text_' | append: i -%}
+    {%- assign icon_key = 'icon_' | append: i -%}
+
+    {%- if block.settings[t_key] != blank -%}
+      {%- assign has_features = true -%}
+
+      <article class="builder__feature builder__feature--{{ block.settings.text_alignment | default: 'left' }}">
+        {%- if block.settings[icon_key] != blank and block.settings.show_icons -%}
+          <div class="builder__feature-icon">
+            {%- render 'image',
+              image: block.settings[icon_key],
+              width: 96,
+              loading: 'lazy'
+            -%}
+          </div>
+        {%- endif -%}
+
+        <div class="builder__feature-content">
+          <h3 class="builder__feature-title">
+            {{ block.settings[t_key] | escape }}
+          </h3>
+
+          {%- if block.settings[p_key] != blank -%}
+            <p class="builder__feature-text">
+              {{ block.settings[p_key] | escape }}
+            </p>
+          {%- endif -%}
+        </div>
+      </article>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if has_features -%}
+  <div class="builder__features builder__features--layout-{{ block.settings.columns | default: 'auto' }} builder__features--style-{{ block.settings.card_style | default: 'background' }}">
+    {{ features_content }}
+  </div>
+{%- endif -%}
+
+{% style %}
+.builder__features {
+  display: grid;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.builder__features--layout-auto {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.builder__features--layout-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.builder__features--layout-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.builder__features--layout-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.builder__feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.builder__feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.builder__feature-title {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: var(--heading-sm, var(--font-size-md));
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-heading);
+}
+
+.builder__feature-text {
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-size: var(--text-small, var(--font-size-sm));
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.builder__features--style-border .builder__feature {
+  border: 1px solid var(--color-border);
+  background: transparent;
+}
+.builder__features--style-background .builder__feature {
+  background: var(--color-surface-subtle);
+  border: 1px solid transparent;
+}
+.builder__features--style-plain .builder__feature {
+  background: transparent;
+  border: none;
+  padding: 0; 
+}
+
+.builder__feature--center {
+  align-items: center;
+  text-align: center;
+}
+.builder__feature--left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.builder__feature-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.builder__feature-icon img,
+.builder__feature-icon .image__img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 767px) {
+  .builder__features {
+    grid-template-columns: 1fr !important; 
+    gap: var(--space-md);
+  }
+}
+{% endstyle %}

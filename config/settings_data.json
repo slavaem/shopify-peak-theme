@@ -1,12 +1,87 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
-  "current": {}
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "type_primary_font": "work_sans_n4",
+      "type_secondary_font": "work_sans_n6",
+      "heading_base_size": 28,
+      "heading_scale": 1.2,
+
+      "radius_base": 12,
+      "spacing_base": 8,
+
+      "max_page_width": "90rem",
+      "min_page_margin": 20,
+
+      "background_color": "#FFFFFF",
+      "site_background_size": "cover",
+      "site_background_overlay_color": "#000000",
+      "site_background_overlay": 0,
+      "site_background_blur": 0,
+
+      "foreground_color": "#121212",
+      "accent_color": "#E41616",
+      "surface_color": "#FFFFFF",
+      "surface_subtle_color": "#F5F5F5",
+      "surface_hover_color": "#F3F3F3",
+      "border_color": "rgba(0,0,0,0.05)",
+      "text_secondary_color": "#444444",
+      "text_muted_color": "#777777",
+      "success_color": "#4CAF50",
+      "danger_color": "#FF4D4F",
+      "rating_color": "#FFB800",
+
+      "card_bg_color": "#FFFFFF",
+      "card_text_alignment": "left",
+      "show_secondary_image": true,
+      "show_vendor": true,
+      "card_shadow_opacity": 10,
+      "image_ratio": "1/1",
+      "image_fit": "cover",
+      "card_title_size": 16,
+      "card_price_size": 18,
+      "card_padding": 12
+    },
+    "Dark Minimal": {
+      "type_primary_font": "work_sans_n4",
+      "type_secondary_font": "work_sans_n6",
+      "heading_base_size": 26,
+      "heading_scale": 1.25,
+
+      "radius_base": 4,
+      "spacing_base": 8,
+
+      "max_page_width": "110rem",
+      "min_page_margin": 24,
+
+      "background_color": "#0F172A",
+      "site_background_size": "cover",
+      "site_background_overlay_color": "#000000",
+      "site_background_overlay": 0,
+      "site_background_blur": 0,
+
+      "foreground_color": "#F8FAFC",
+      "accent_color": "#38BDF8",
+      "surface_color": "#1E293B",
+      "surface_subtle_color": "#334155",
+      "surface_hover_color": "#475569",
+      "border_color": "rgba(255,255,255,0.1)",
+      "text_secondary_color": "#CBD5E1",
+      "text_muted_color": "#94A3B8",
+      "success_color": "#22C55E",
+      "danger_color": "#EF4444",
+      "rating_color": "#F59E0B",
+
+      "card_bg_color": "#1E293B",
+      "card_text_alignment": "left",
+      "show_secondary_image": true,
+      "show_vendor": false,
+      "card_shadow_opacity": 20,
+      "image_ratio": "3/4",
+      "image_fit": "cover",
+      "card_title_size": 16,
+      "card_price_size": 18,
+      "card_padding": 16
+    }
+  }
 }

@@ -1,0 +1,104 @@
+{% doc %}
+  Builder Heading
+
+  Renders a flexible heading with dynamic HTML tag (H1-H4) and alignment.
+
+  Usage:
+    {% render 'builder-heading', block: block %}
+
+  Example Block Schema (Скопируй этот JSON в schema нужной секции в массив "blocks"):
+  {
+    "type": "heading",
+    "name": "Heading",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading text",
+        "default": "Section Heading"
+      },
+      {
+        "type": "select",
+        "id": "tag",
+        "label": "HTML Tag",
+        "options": [
+          { "value": "h1", "label": "H1" },
+          { "value": "h2", "label": "H2" },
+          { "value": "h3", "label": "H3" },
+          { "value": "h4", "label": "H4" }
+        ],
+        "default": "h2"
+      },
+      {
+        "type": "select",
+        "id": "alignment",
+        "label": "Alignment",
+        "options": [
+          { "value": "left", "label": "Left" },
+          { "value": "center", "label": "Center" },
+          { "value": "right", "label": "Right" }
+        ],
+        "default": "left"
+      }
+    ]
+  }
+{% enddoc %}
+
+{%- liquid
+  assign heading_text = block.settings.title | escape
+  assign heading_tag = block.settings.tag | default: 'h2'
+  assign alignment = block.settings.alignment | default: 'left'
+-%}
+
+{% if heading_text != blank %}
+  <div class="builder__heading builder__heading--{{ alignment }}">
+    <{{ heading_tag }} class="builder__title">
+      {{ heading_text }}
+    </{{ heading_tag }}>
+  </div>
+{% endif %}
+
+{% style %}
+.builder__heading {
+  width: 100%;
+  display: flex;
+}
+
+.builder__heading--left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.builder__heading--center {
+  justify-content: center;
+  text-align: center;
+}
+
+.builder__heading--right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.builder__title {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-heading);
+}
+
+h1.builder__title {
+  font-size: var(--hero-title);
+}
+
+h2.builder__title {
+  font-size: var(--heading-lg);
+}
+
+h3.builder__title {
+  font-size: var(--heading-md);
+}
+
+h4.builder__title {
+  font-size: var(--heading-sm);
+}
+{% endstyle %}

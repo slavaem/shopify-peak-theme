@@ -1,0 +1,45 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-builder",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "title": "Secure Payment",
+            "tag": "h1",
+            "alignment": "center"
+          }
+        },
+        "ssl_info": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>Encrypted Connection (SSL)</h2><p>Our store operates via a secure <strong>SSL (Secure Sockets Layer)</strong> connection. All checkout data is encrypted and protected from third-party access.</p>"
+          }
+        },
+        "payment_features": {
+          "type": "features",
+          "settings": {
+            "columns": "3",
+            "card_style": "background",
+            "text_alignment": "center",
+            "show_icons": false,
+            "title_1": "Card Payments",
+            "text_1": "Pay quickly with Visa, Mastercard, Apple Pay, or Google Pay from any country.",
+            "title_2": "Local Bank Payments",
+            "text_2": "We support trusted local payment providers for fast order confirmation.",
+            "title_3": "Payment Protection",
+            "text_3": "We never store your card details. Transactions are processed through certified payment gateways."
+          }
+        }
+      },
+      "block_order": ["heading", "ssl_info", "payment_features"],
+      "settings": {
+        "text_alignment": "center",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

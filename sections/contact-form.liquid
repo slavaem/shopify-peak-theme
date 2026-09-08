@@ -1,0 +1,354 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+
+  assign email_label    = 'pages.contact.email' | t | default: 'Email'
+  assign location_label = 'pages.contact.location' | t | default: 'Location'
+  assign hours_label    = 'pages.contact.hours' | t | default: 'Working hours'
+
+  assign display_title    = section.settings.title
+  assign display_subtitle = section.settings.subtitle
+  
+  assign val_email = section.settings.email | default: shop.email
+  
+  assign loc_default  = 'pages.contact.location_value' | t | default: 'Kyiv, Ukraine'
+  assign val_location = section.settings.location | default: loc_default
+  
+  assign hours_default = 'pages.contact.hours_value' | t | default: 'Mon – Fri / 10:00 – 18:00'
+  assign val_hours     = section.settings.hours | default: hours_default
+-%}
+
+<section 
+  id="contact-{{ sid }}" 
+  class="page page--contact section page-width"
+  data-component="contact-form"
+>
+  {% if display_title != blank or display_subtitle != blank %}
+    <div class="page-intro">
+      {% if display_title != blank %}
+        <h1 class="page-intro__title">{{ display_title | escape }}</h1>
+      {% endif %}
+      {% if display_subtitle != blank %}
+        <p class="page-intro__subtitle">{{ display_subtitle | escape }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="page-grid page-grid--contact">
+    
+    <div class="page-card page-card--info">
+      {% if val_email != blank %}
+        <div class="info-group">
+          <h3>{{ email_label }}</h3>
+          <p><a href="mailto:{{ val_email }}">{{ val_email }}</a></p>
+        </div>
+      {% endif %}
+
+      {% if val_location != blank %}
+        <div class="info-group">
+          <h3>{{ location_label }}</h3>
+          <p>{{ val_location }}</p>
+        </div>
+      {% endif %}
+
+      {% if val_hours != blank %}
+        <div class="info-group">
+          <h3>{{ hours_label }}</h3>
+          <p>{{ val_hours }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="page-card page-card--form">
+      {%- assign contact_form_id = 'ContactForm-' | append: sid -%}
+      {%- form 'contact', id: contact_form_id, class: 'contact-form' -%}
+        
+        {%- if form.posted_successfully? -%}
+          <p class="form-success" role="status" tabindex="-1" autofocus>
+            {{ 'forms.success' | t | default: 'Thank you! Your message has been sent.' }}
+          </p>
+        {%- endif -%}
+
+        {%- if form.errors -%}
+          <div class="form-errors">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="form-group">
+          <label for="ContactForm-name-{{ sid }}">{{ 'forms.name' | t | default: 'Name' }}</label>
+          <input 
+            type="text" 
+            id="ContactForm-name-{{ sid }}" 
+            name="contact[name]" 
+            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            placeholder="{{ 'forms.name' | t | default: 'Name' }}"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="ContactForm-email-{{ sid }}">{{ 'forms.email' | t | default: 'Email' }}</label>
+          <input 
+            type="email" 
+            id="ContactForm-email-{{ sid }}" 
+            name="contact[email]" 
+            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            placeholder="{{ val_email }}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="ContactForm-body-{{ sid }}">{{ 'forms.message' | t | default: 'Message' }}</label>
+          <textarea 
+            rows="6" 
+            id="ContactForm-body-{{ sid }}" 
+            name="contact[body]"
+            placeholder="{{ 'forms.message' | t | default: 'Message' }}"
+            required
+          >{{ form.body }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn--primary">
+          {{ 'forms.send' | t | default: 'Send message' }}
+        </button>
+
+      {%- endform -%}
+    </div>
+
+  </div>
+</section>
+
+{% style %}
+#contact-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#contact-{{ sid }} .page-intro {
+  margin-bottom: var(--space-xl, 32px);
+  text-align: left;
+}
+
+#contact-{{ sid }} .page-intro__title {
+  margin: 0 0 var(--space-xs, 8px);
+  font-size: var(--heading-lg, 36px);
+  font-weight: var(--font-weight-bold, 700);
+}
+
+#contact-{{ sid }} .page-intro__subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base, 16px);
+  max-width: 600px;
+}
+
+#contact-{{ sid }} .page-grid--contact {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-xl, 32px);
+  align-items: start;
+}
+
+#contact-{{ sid }} .info-group {
+  margin-bottom: var(--space-md, 20px);
+}
+
+#contact-{{ sid }} .info-group:last-child {
+  margin-bottom: 0;
+}
+
+#contact-{{ sid }} .info-group h3 {
+  font-size: var(--text-small, 13px);
+  font-weight: var(--font-weight-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-2xs, 4px);
+  color: var(--color-text-muted);
+}
+
+#contact-{{ sid }} .info-group p {
+  margin: 0;
+  font-size: var(--font-size-base, 16px);
+  color: var(--color-text-primary);
+}
+
+#contact-{{ sid }} .info-group a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#contact-{{ sid }} .contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 20px);
+}
+
+#contact-{{ sid }} .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs, 6px);
+}
+
+#contact-{{ sid }} label {
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary);
+}
+
+#contact-{{ sid }} input[type="text"],
+#contact-{{ sid }} input[type="email"],
+#contact-{{ sid }} textarea {
+  width: 100%;
+  padding: var(--card-padding, 12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base, 16px);
+  transition: border-color var(--transition-fast, 0.2s ease);
+}
+
+#contact-{{ sid }} input[type="text"]:focus,
+#contact-{{ sid }} input[type="email"]:focus,
+#contact-{{ sid }} textarea:focus {
+  outline: none;
+  border-color: var(--color-text-primary);
+}
+
+#contact-{{ sid }} textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+#contact-{{ sid }} .form-success {
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  background: var(--color-success-bg, #e6fffa);
+  border: 1px solid var(--color-success-border, #38b2ac);
+  color: var(--color-success-text, #234e52);
+  border-radius: var(--radius-md, 6px);
+  margin-bottom: var(--space-xs, 8px);
+}
+
+#contact-{{ sid }} .form-errors {
+  color: var(--color-error, #e53e3e);
+  margin-bottom: var(--space-xs, 8px);
+}
+
+@media screen and (max-width: 768px) {
+  #contact-{{ sid }} .page-grid--contact {
+    grid-template-columns: 1fr;
+  }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": "section",
+  "class": "section-contact-form",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    { 
+      "type": "text", 
+      "id": "title", 
+      "label": "Title", 
+      "default": "Contact us" 
+    },
+    { 
+      "type": "text", 
+      "id": "subtitle", 
+      "label": "Subtitle", 
+      "default": "If you have any questions about products, orders, or partnerships — we’re here to help." 
+    },
+    { 
+      "type": "text", 
+      "id": "email", 
+      "label": "Email", 
+      "default": "email@example.com" 
+    },
+    { 
+      "type": "text", 
+      "id": "location", 
+      "label": "Location", 
+      "default": "Kyiv, Ukraine" 
+    },
+    { 
+      "type": "text", 
+      "id": "hours", 
+      "label": "Working hours", 
+      "default": "Mon – Fri / 10:00 – 18:00" 
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    { 
+      "name": "Contact form",
+      "settings": {
+        "title": "Contact us",
+        "subtitle": "If you have any questions about products, orders, or partnerships — we’re here to help.",
+        "email": "email@example.com",
+        "location": "Kyiv, Ukraine",
+        "hours": "Mon – Fri / 10:00 – 18:00",
+        "color_mode": "theme",
+        "bg_color": "#FFFFFF",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  ]
+}
+{% endschema %}

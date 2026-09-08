@@ -27,6 +27,7 @@
     "search": "Search",
     "secondary": "Secondary",
     "section": "Section",
+    "search_section": "Search",
     "settings": "Settings",
     "sidebar": "Sidebar",
     "text": "Text",
@@ -75,6 +76,261 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
+    }
+  },
+
+  "sections": {
+    "header": {
+      "title": "Header",
+      "settings": {
+        "logo": {
+          "label": "Logo image"
+        },
+        "menu": {
+          "label": "Main menu"
+        }
+      }
+    },
+
+    "video_hero": {
+      "title": "Video hero",
+      "settings": {
+        "heading": {
+          "label": "Heading"
+        },
+        "subtitle": {
+          "label": "Subtitle"
+        },
+        "button_label": {
+          "label": "Button label"
+        }
+      }
+    },
+
+    "usp": {
+      "title": "USP",
+      "blocks": {
+        "item": {
+          "name": "USP item",
+          "settings": {
+            "icon": {
+              "label": "Icon"
+            },
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        }
+      }
+    },
+
+    "best_sellers": {
+      "title": "Best sellers",
+      "settings": {
+        "section_label": {
+          "label": "Top label"
+        },
+        "title": {
+          "label": "Section title"
+        }
+      }
+    },
+
+    "masonry_gallery": {
+      "title": "Masonry gallery",
+      "settings": {
+        "title": {
+          "label": "Heading"
+        },
+        "columns_desktop": {
+          "label": "Desktop columns"
+        }
+      }
+    },
+
+    "product_slider": {
+      "title": "Hybrid slider",
+      "settings": {
+        "title": {
+          "label": "Section title"
+        },
+        "collection": {
+          "label": "Collection"
+        },
+        "products_limit": {
+          "label": "Products limit"
+        }
+      }
+    },
+
+    "reviews": {
+      "title": "Reviews",
+      "settings": {
+        "title": {
+          "label": "Section title"
+        },
+        "subtitle": {
+          "label": "Subtitle"
+        },
+        "global_rating": {
+          "label": "Global rating"
+        },
+        "cta_label": {
+          "label": "CTA label"
+        }
+      }
+    },
+
+    "newsletter": {
+      "title": "Newsletter",
+      "settings": {
+        "title": {
+          "label": "Title"
+        },
+        "subtitle": {
+          "label": "Subtitle"
+        },
+        "placeholder": {
+          "label": "Email placeholder"
+        },
+        "button_label": {
+          "label": "Button label"
+        },
+        "success": {
+          "label": "Success message"
+        },
+        "note": {
+          "label": "Note under form"
+        }
+      }
+    },
+    "about_brand": {
+      "title": "About page",
+      "settings": {
+        "title": {
+          "label": "Main title"
+        },
+        "subtitle": {
+          "label": "Subtitle"
+        },
+        "description": {
+          "label": "Description text"
+        },
+        "image_1": {
+          "label": "Image 1"
+        },
+        "image_2": {
+          "label": "Image 2"
+        },
+        "image_3": {
+          "label": "Image 3"
+        },
+        "list_title": {
+          "label": "List title"
+        },
+        "list_content": {
+          "label": "List content"
+        }
+      },
+      "blocks": {
+        "feature_card": {
+          "name": "Feature card",
+          "settings": {
+            "title": {
+              "label": "Card title"
+            },
+            "text": {
+              "label": "Card text"
+            }
+          }
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact form",
+      "settings": {
+        "title": {
+          "label": "Page title"
+        },
+        "subtitle": {
+          "label": "Page subtitle"
+        },
+        "email": {
+          "label": "Email address"
+        },
+        "location": {
+          "label": "Location"
+        },
+        "hours": {
+          "label": "Working hours"
+        }
+      }
+    },
+
+    "page_builder": {
+      "name": "Page Builder",
+      "settings": {
+        "padding_top": "Padding top",
+        "padding_bottom": "Padding bottom"
+      },
+      "blocks": {
+        "hero": {
+          "name": "Hero Heading",
+          "settings": {
+            "title": "Heading text",
+            "subtitle": "Subheading text"
+          }
+        },
+        "text": {
+          "name": "Rich Text Block",
+          "settings": {
+            "content": "Content"
+          }
+        },
+        "media": {
+          "name": "Image Gallery",
+          "settings": {
+            "image_1": "First image",
+            "image_2": "Second image",
+            "image_3": "Third image"
+          }
+        },
+        "features": {
+          "name": "Features Grid",
+          "settings": {
+            "title_1": "Card 1 Title",
+            "text_1": "Card 1 Text",
+            "title_2": "Card 2 Title",
+            "text_2": "Card 2 Text",
+            "title_3": "Card 3 Title",
+            "text_3": "Card 3 Text"
+          }
+        },
+        "rich_list": {
+          "name": "Information List",
+          "settings": {
+            "title": "List title",
+            "content": "List content"
+          }
+        }
+      }
+    },
+    "footer": {
+      "title": "Footer",
+      "settings": {
+        "menu": {
+          "label": "Menu"
+        },
+        "show_payment_icons": {
+          "label": "Show payment icons"
+        },
+        "show_powered_by": {
+          "label": "Show powered by Shopify"
+        }
+      }
     }
   }
 }

@@ -1,0 +1,258 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign bg_value = 'var(--color-surface)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+-%}
+
+<section 
+  id="usp-{{ sid }}" 
+  class="usp section"
+  data-component="usp-features"
+>
+  <div class="page-width">
+    {% if section.blocks.size > 0 %}
+      <ul class="usp__grid" role="list">
+        {% for block in section.blocks %}
+          {%- liquid
+            case block.type
+              when 'free_shipping'
+                assign title_key = 'sections.usp.free_shipping_title'
+                assign text_key = 'sections.usp.free_shipping_text'
+              when 'easy_returns'
+                assign title_key = 'sections.usp.easy_returns_title'
+                assign text_key = 'sections.usp.easy_returns_text'
+              when 'secure_payment'
+                assign title_key = 'sections.usp.secure_payment_title'
+                assign text_key = 'sections.usp.secure_payment_text'
+              when 'support'
+                assign title_key = 'sections.usp.support_title'
+                assign text_key = 'sections.usp.support_text'
+              when 'item'
+                assign title_key = block.settings.title_key
+                assign text_key = block.settings.text_key
+              else
+                assign title_key = blank
+                assign text_key = blank
+            endcase
+
+            assign item_title = block.settings.title
+            if item_title == blank and title_key != blank
+              assign item_title = title_key | t
+            endif
+
+            assign item_text = block.settings.text
+            if item_text == blank and text_key != blank
+              assign item_text = text_key | t
+            endif
+          -%}
+
+          <li class="usp__item" {{ block.shopify_attributes }}>
+            {% if block.settings.icon != blank %}
+              <span class="usp__icon" aria-hidden="true">{{ block.settings.icon | escape }}</span>
+            {% endif %}
+
+            <div class="usp__content">
+              {% if item_title != blank %}
+                <h3 class="usp__title">
+                  {{ item_title | escape }}
+                </h3>
+              {% endif %}
+
+              {% if item_text != blank %}
+                <p class="usp__text">
+                  {{ item_text | escape }}
+                </p>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</section>
+
+{% style %}
+#usp-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+  border-top: 1px solid var(--color-border);
+}
+
+#usp-{{ sid }} .usp__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-lg, 24px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#usp-{{ sid }} .usp__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 12px);
+}
+
+#usp-{{ sid }} .usp__icon {
+  font-size: var(--font-size-3xl, 28px);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+#usp-{{ sid }} .usp__title {
+  margin: 0 0 var(--space-2xs, 4px) 0;
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-medium, 600);
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+#usp-{{ sid }} .usp__text {
+  margin: 0;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-base, 1.4);
+}
+
+@media (max-width: 767px) {
+  #usp-{{ sid }} .usp__item {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "USP Features",
+  "tag": "section",
+  "class": "section-usp",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme Default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 32
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Generic Feature",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "✨" },
+        { "type": "text", "id": "title_key", "label": "Title Translation Key" },
+        { "type": "text", "id": "text_key", "label": "Text Translation Key" },
+        { "type": "text", "id": "title", "label": "Custom Title" },
+        { "type": "text", "id": "text", "label": "Custom Text" }
+      ]
+    },
+    {
+      "type": "free_shipping",
+      "name": "Free Shipping",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "🚚" },
+        { "type": "text", "id": "title", "label": "Custom title", "info": "Leave blank for automatic theme translation" },
+        { "type": "text", "id": "text", "label": "Custom text", "info": "Leave blank for automatic theme translation" }
+      ]
+    },
+    {
+      "type": "easy_returns",
+      "name": "Easy Returns",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "🔄" },
+        { "type": "text", "id": "title", "label": "Custom title", "info": "Leave blank for automatic theme translation" },
+        { "type": "text", "id": "text", "label": "Custom text", "info": "Leave blank for automatic theme translation" }
+      ]
+    },
+    {
+      "type": "secure_payment",
+      "name": "Secure Payment",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "🔒" },
+        { "type": "text", "id": "title", "label": "Custom title", "info": "Leave blank for automatic theme translation" },
+        { "type": "text", "id": "text", "label": "Custom text", "info": "Leave blank for automatic theme translation" }
+      ]
+    },
+    {
+      "type": "support",
+      "name": "24/7 Support",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "💬" },
+        { "type": "text", "id": "title", "label": "Custom title", "info": "Leave blank for automatic theme translation" },
+        { "type": "text", "id": "text", "label": "Custom text", "info": "Leave blank for automatic theme translation" }
+      ]
+    },
+    {
+      "type": "custom",
+      "name": "Custom Feature",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (Emoji)", "default": "✨" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "USP Features",
+      "settings": {
+        "color_mode": "theme",
+        "bg_color": "#F4F4F4",
+        "padding_top": 32,
+        "padding_bottom": 32
+      },
+      "blocks": [
+        { "type": "free_shipping" },
+        { "type": "easy_returns" },
+        { "type": "secure_payment" },
+        { "type": "support" }
+      ]
+    }
+  ]
+}
+{% endschema %}

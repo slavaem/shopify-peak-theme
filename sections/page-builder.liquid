@@ -1,0 +1,434 @@
+{%- assign sid = section.id -%}
+
+<section id="about-{{ sid }}" class="section section--about about">
+  {% liquid
+    assign title_default = 'sections.about_brand.title' | t | default: 'Peak Framework'
+    assign subtitle_default = 'sections.about_brand.subtitle' | t | default: 'Flexible, modern, and fully modular Shopify theme.'
+
+    assign aboutbrand_title = section.settings.title | default: title_default
+    assign aboutbrand_subtitle = section.settings.subtitle | default: subtitle_default
+  %}
+
+  <div class="about__inner">
+    <!-- HERO -->
+    {% if section.settings.title != blank or section.settings.subtitle != blank %}
+      <header class="about__hero">
+        {% if aboutbrand_title != blank %}
+          <h1 class="about__title">
+            {{ aboutbrand_title }}
+          </h1>
+        {% endif %}
+
+        {% if aboutbrand_subtitle != blank %}
+          <p class="about__subtitle">
+            {{ aboutbrand_subtitle }}
+          </p>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    <!-- DESCRIPTION -->
+    {% if section.settings.description != blank %}
+      <div class="about__description">
+        {{ section.settings.description }}
+      </div>
+    {% endif %}
+
+    <!-- IMAGES -->
+    {% if section.settings.show_images %}
+      <div class="about__media">
+        {% for i in (1..3) %}
+          {% assign image_key = 'image_' | append: i %}
+          {% assign image = section.settings[image_key] %}
+
+          <figure class="about__media-item">
+            {% if image %}
+              {% liquid
+                assign img_alt = image.alt | strip
+                if img_alt == blank
+                  assign img_alt = aboutbrand_title
+                endif
+              %}
+              {% render 'image',
+                image: image,
+                width: 900,
+                loading: 'lazy',
+                sizes: '(min-width: 768px) 33vw, 100vw',
+                alt: img_alt
+              %}
+            {% else %}
+              {{ 'lifestyle-' | append: i | placeholder_svg_tag: 'about__placeholder' }}
+            {% endif %}
+          </figure>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURES BLOCK GRID -->
+    {% if section.blocks.size > 0 %}
+      <div class="about__features">
+        {% for block in section.blocks %}
+          {% if block.type == 'feature_card' %}
+            <article class="about__feature" {{ block.shopify_attributes }}>
+              {% if block.settings.title != blank %}
+                <h3 class="about__feature-title">
+                  {{ block.settings.title }}
+                </h3>
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <p class="about__feature-text">
+                  {{ block.settings.text }}
+                </p>
+              {% endif %}
+            </article>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- LIST / BOTTOM SECTION -->
+    {% if section.settings.list_title != blank or section.settings.list_content != blank %}
+      <section class="about__list">
+        {% if section.settings.list_title != blank %}
+          <h2 class="about__list-title">
+            {{ section.settings.list_title }}
+          </h2>
+        {% endif %}
+
+        {% if section.settings.list_content != blank %}
+          <div class="about__list-content">
+            {{ section.settings.list_content }}
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+  </div>
+</section>
+
+{% style %}
+#about-{{ sid }} {
+  --about-content-width: {{ section.settings.content_width | default: 1200 }}px;
+  --about-text-align: {{ section.settings.text_alignment | default: 'center' }};
+
+  {% if section.settings.text_alignment == 'left' %}
+    --about-flex-align: flex-start;
+  {% elsif section.settings.text_alignment == 'right' %}
+    --about-flex-align: flex-end;
+  {% else %}
+    --about-flex-align: center;
+  {% endif %}
+
+  padding: var(--space-2xl) var(--page-margin);
+}
+
+#about-{{ sid }} .about__inner {
+  max-width: var(--about-content-width);
+  margin: 0 auto;
+}
+
+/* HERO */
+#about-{{ sid }} .about__hero {
+  text-align: var(--about-text-align);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: var(--about-flex-align);
+}
+
+#about-{{ sid }} .about__title {
+  font-size: var(--hero-title);
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+#about-{{ sid }} .about__subtitle {
+  font-size: var(--subtitle);
+  color: var(--color-text-secondary);
+}
+
+/* DESCRIPTION */
+#about-{{ sid }} .about__description {
+  line-height: 1.7;
+  margin-bottom: var(--space-xl);
+  color: var(--color-text-secondary);
+  text-align: var(--about-text-align);
+}
+
+/* MEDIA */
+#about-{{ sid }} .about__media {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+#about-{{ sid }} .about__media-item {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  background: var(--color-surface-subtle);
+  aspect-ratio: 4 / 3;
+}
+
+#about-{{ sid }} .about__media-item img,
+#about-{{ sid }} .about__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#about-{{ sid }} .about__media-item img {
+  transition: transform var(--transition-base);
+}
+
+#about-{{ sid }} .about__media-item:hover img {
+  transform: scale(1.03);
+}
+
+/* FEATURES */
+#about-{{ sid }} .about__features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+#about-{{ sid }} .about__feature {
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  will-change: transform;
+}
+
+#about-{{ sid }} .about__feature-title {
+  font-size: var(--heading-sm);
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-primary);
+}
+
+#about-{{ sid }} .about__feature-text {
+  color: var(--color-text-secondary);
+  font-size: var(--text-small);
+}
+
+#about-{{ sid }} .about__feature:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* LIST CONTENT */
+#about-{{ sid }} .about__list {
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+#about-{{ sid }} .about__list-title {
+  font-size: var(--heading-md);
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+#about-{{ sid }} .about__list-content {
+  color: var(--color-text-secondary);
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "About Page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 600,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Hero Content"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Main Title",
+      "default": "Peak Framework"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Flexible, modern, and fully modular Shopify theme."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description text",
+      "default": "<p><b>Peak</b> is an ecosystem of isolated sections. Each block features independent logic and styles, fully manageable via the customizer. Control colors, fonts, and spacing with zero coding. Your freedom is our priority.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Media Grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Enable Media Section",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "header",
+      "content": "List Section"
+    },
+    {
+      "type": "text",
+      "id": "list_title",
+      "label": "List Title",
+      "default": "What This Theme Demonstrates"
+    },
+    {
+      "type": "richtext",
+      "id": "list_content",
+      "label": "List Content",
+      "default": "<ul><li>Reusable layout system</li><li>Design tokens integration</li><li>Isolated Architecture</li><li>Multilingual Core</li></ul>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature_card",
+      "name": "Feature Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Title",
+          "default": "Feature"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Card Text",
+          "default": "Reusable sections and scalable CSS variables."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Page (Full Brand Story)",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": 1200,
+        "title": "Peak Framework",
+        "subtitle": "Flexible, modern, and fully modular Shopify theme.",
+        "show_images": true,
+        "list_title": "What This Theme Demonstrates"
+      },
+      "blocks": [
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Atomic Architecture",
+            "text": "Each section is fully isolated. Styles and logic live inside the module — copy and reuse in any project."
+          }
+        },
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Full Control",
+            "text": "Global styles are centralized, but everything — spacing, typography, colors — is configurable via the customizer."
+          }
+        },
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Multilingual Ready",
+            "text": "All interface and content strings are prepared for easy localization from day one."
+          }
+        },
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Your Rules",
+            "text": "A flexible foundation you can adapt 100% to your needs. No restrictions. No unnecessary code."
+          }
+        }
+      ]
+    },
+    {
+      "name": "About Page (Minimal Left Aligned)",
+      "settings": {
+        "text_alignment": "left",
+        "content_width": 960,
+        "title": "Core Features",
+        "subtitle": "Everything you need to build high-converting storefronts.",
+        "description": "",
+        "show_images": false,
+        "list_title": ""
+      },
+      "blocks": [
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Performance First",
+            "text": "Zero heavy dependencies. Pure CSS custom variables and native Liquid filters."
+          }
+        },
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Design Tokens",
+            "text": "Consistent typography scale, border radius, and dynamic spacing rules."
+          }
+        },
+        {
+          "type": "feature_card",
+          "settings": {
+            "title": "Shopify 2.0 Standard",
+            "text": "Full support for JSON templates, app blocks, and section presets."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

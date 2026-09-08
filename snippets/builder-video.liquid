@@ -1,0 +1,83 @@
+{% doc %}
+  Builder Video
+
+  Displays a Shopify-hosted video element with responsive controls and auto-mute.
+
+  Usage:
+    {% render 'builder-video', block: block %}
+
+  Example Block Schema (Скопируй этот JSON в schema нужной секции в массив "blocks"):
+  {
+    "type": "video",
+    "name": "Video",
+    "settings": [
+      {
+        "type": "video",
+        "id": "video",
+        "label": "Shopify hosted video"
+      },
+      {
+        "type": "checkbox",
+        "id": "autoplay",
+        "label": "Autoplay",
+        "default": false,
+        "info": "Autoplayed videos will be muted automatically by browsers."
+      },
+      {
+        "type": "checkbox",
+        "id": "loop",
+        "label": "Loop video",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_controls",
+        "label": "Show video controls",
+        "default": true
+      }
+    ]
+  }
+{% enddoc %}
+
+{%- liquid
+  assign video_element = block.settings.video
+  assign is_autoplay = block.settings.autoplay | default: false
+  assign is_loop = block.settings.loop | default: false
+  assign show_controls = block.settings.show_controls
+  if show_controls == nil
+    assign show_controls = true
+  endif
+-%}
+
+{% if video_element != blank %}
+  <div class="builder__video">
+    {{
+      video_element
+      | video_tag:
+        autoplay: is_autoplay,
+        loop: is_loop,
+        controls: show_controls,
+        muted: is_autoplay,
+        image_size: '1200x'
+    }}
+  </div>
+{% endif %}
+
+{% style %}
+.builder__video {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-surface-subtle);
+}
+
+.builder__video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+{% endstyle %}

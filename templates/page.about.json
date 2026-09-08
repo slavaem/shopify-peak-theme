@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "about-brand",
+      "settings": {
+        "title": "Peak Framework",
+        "subtitle": "Flexible, modern, and fully modular Shopify theme.",
+        "description": "<p><strong>Peak</strong> is an ecosystem of isolated sections. Each block features independent logic and styles, fully manageable via the customizer. Control colors, fonts, and spacing with zero coding. Your freedom is our priority.</p>",
+        "list_title": "What This Theme Demonstrates",
+        "list_content": "<ul><li>Reusable layout system</li><li>Design tokens</li><li>Isolated Architecture</li><li>Multilingual Core</li></ul>"
+      }
+    }
+  },
+  "order": ["main"]
+}

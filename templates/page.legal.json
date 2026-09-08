@@ -1,0 +1,52 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-builder",
+      "blocks": {
+        "hero": {
+          "type": "hero",
+          "settings": {
+            "title": "Legal Information and Terms of Use",
+            "subtitle": ""
+          }
+        },
+        "content_1": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>1. General Provisions</h2><p>This website is operated by our snowboard equipment store. By using this site, you agree to the terms and conditions described in this document. We reserve the right to update these terms without prior notice.</p>"
+          }
+        },
+        "content_2": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>2. Intellectual Property</h2><p>All content on this website including text, images and logos is protected by copyright. Reproduction is allowed only with permission.</p>"
+          }
+        },
+        "content_3": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>3. Disclaimer</h2><p>We do our best to provide accurate product information. However, product performance may vary depending on riding style, conditions, and individual preferences.</p>"
+          }
+        },
+        "content_4": {
+          "type": "text",
+          "settings": {
+            "content": "<h2>4. Contact Information</h2><p>If you have any legal or partnership questions, please contact us via the Contact page.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "hero",
+        "content_1",
+        "content_2",
+        "content_3",
+        "content_4"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "padding_top": 64
+      }
+    }
+  },
+  "order": ["main"]
+}

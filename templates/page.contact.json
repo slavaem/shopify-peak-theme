@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "main": {
+      "type": "contact-form",
+      "settings": {
+        "title": "Contact Us",
+        "subtitle": "If you have any questions about products, orders, or partnerships, we are here to help."
+      }
+    }
+  },
+  "order": ["main"]
+}

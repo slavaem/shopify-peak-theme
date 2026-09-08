@@ -1,37 +1,133 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}">
-{{ 'hero.css' | asset_url | stylesheet_tag }}
+<html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
-    {% # Inlined CSS Variables %}
-    {% render 'css-variables' %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
 
-    {% comment %}
-      Font preloading:
-      1. Preconnect to font CDN for faster connection
-      2. Preload only the critical font variant (base weight)
-      3. Additional variants load on-demand via @font-face
-    {% endcomment %}
-    {% unless settings.type_primary_font.system? %}
-      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
 
-      {% comment %} Preload the base font variant for initial page render {% endcomment %}
-      {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
-    {% endunless %}
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
 
-    {% # Load and preload the critical CSS %}
-    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
 
-    {% # Social, title, etc. %}
     {% render 'meta-tags' %}
+    {% render 'css-variables' %}
+    
+    {%- liquid
+      assign main_font = settings.type_primary_font
+    -%}
+    
+    {%- unless main_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+      {%- if main_font != blank -%}
+        {{ main_font | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+      {%- endif -%}
+    {%- endunless -%}
+    
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'layout.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'content.css' | asset_url | stylesheet_tag }}
+    {{ 'component-product-card.css' | asset_url | stylesheet_tag }}
+    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'cart-notification.css' | asset_url | stylesheet_tag }}
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
 
     {{ content_for_header }}
+
+    <script>
+      window.theme = window.theme || {};
+      try {
+        window.accessibilityStrings = {
+          wishlistClearConfirm: {{ 'pages.wishlist.confirm_clear' | t | default: 'Clear wishlist?' | json }},
+          cartError: {{ 'cart.general.error' | t | default: 'Error' | json }}
+        };
+      } catch (e) { console.error("Strings fail", e); }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js" defer></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    <script src="{{ 'component-product-card.js' | asset_url }}" defer></script>
+
+    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+    <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer></script>
+    
+    <script>
+      window.Shopify = window.Shopify || {};
+      window.Shopify.money_format = {{ shop.money_format | json }};
+      
+      window.currency = {
+        symbol: {{ cart.currency.symbol | default: '$' | json }},
+        code: {{ cart.currency.iso_code | default: 'USD' | json }}
+      };
+    </script>
+
+    <script>
+      window.themeStrings = {
+
+        cartAdded: {{ 'sections.best_sellers.cart_added' | t | json }},
+        wishlistAdded: {{ 'sections.best_sellers.wishlist_added' | t | json }},
+
+        confirmClearTitle: {{ 'cart.confirm_clear_title' | t | json }},
+        confirmClearText: {{ 'cart.confirm_clear_text' | t | json }},
+
+        cartTitle: {{ 'cart.title' | t | json }},
+        cartEmpty: {{ 'cart.empty' | t | json }}
+
+      };
+    </script>
   </head>
 
-  <body>
+  <body class="gradient">
+    {%- if settings.site_background_video != blank -%}
+    <div class="global-video-bg-wrapper" aria-hidden="true">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="{{ settings.site_background_image | image_url: width: 2000 }}"
+      >
+        {%- for source in settings.site_background_video.sources -%}
+          <source src="{{ source.url }}" type="{{ source.mime_type }}">
+        {%- endfor -%}
+      </video>
+    </div>
+  {%- endif -%}
+    <a class="skip-to-content-link button visually-hidden" href="#MainContent">Skip to content</a>
+
     {% sections 'header-group' %}
 
-    {{ content_for_layout }}
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
+    {% render 'cart-notification' %}
+    <script>
+      window.shopUrl = '{{ request.origin }}';
+      window.routes = {
+        cart_add_url: '{{ routes.cart_add_url }}',
+        cart_change_url: '{{ routes.cart_change_url }}',
+        cart_update_url: '{{ routes.cart_update_url }}',
+        cart_url: '{{ routes.cart_url }}',
+        predictive_search_url: '{{ routes.predictive_search_url }}'
+      };
+    </script>
   </body>
 </html>

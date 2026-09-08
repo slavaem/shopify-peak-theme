@@ -1,20 +1,55 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_size": 32
+          }
+        },
+
+        "price": {
+          "type": "price",
+          "settings": {
+            "highlight": true
+          }
+        },
+
+        "description": {
+          "type": "description",
+          "settings": {
+            "max_width": 500
+          }
+        },
+
+        "variants": {
+          "type": "variants",
+          "settings": {
+            "style": "buttons"
+          }
+        },
+
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic": true
+          }
+        }
+      },
+
+      "block_order": [
+        "title",
+        "price",
+        "description",
+        "variants",
+        "buy_buttons"
+      ],
+
       "settings": {}
     }
   },
-  "order": [
-    "main"
-  ]
+
+  "order": ["main"]
 }

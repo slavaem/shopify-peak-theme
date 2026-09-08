@@ -1,0 +1,174 @@
+:root {
+  /* =========================
+     TYPOGRAPHY (Глобальное назначение ролей шрифтов)
+  ========================= */
+  --font-family-body: var(--font-primary--family);
+  --font-family-heading: var(--font-secondary--family);
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-md: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 36px;
+  --font-size-4xl: 48px;
+
+  --line-height-base: 1.4;
+  --line-height-heading: 1.2;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* =========================
+     SEMANTIC TYPOGRAPHY
+  ========================= */
+  --text-body: var(--font-size-base);
+  --text-small: var(--font-size-sm);
+
+  --heading-sm: var(--heading-base);
+  --heading-md: calc(var(--heading-base) * var(--heading-scale));
+  --heading-lg: calc(
+    var(--heading-base) * var(--heading-scale) * var(--heading-scale)
+  );
+
+  --hero-title: calc(var(--heading-lg) * 1.3);
+  --hero-padding: clamp(4rem, 8vw, 8rem);
+  --hero-gap: clamp(2rem, 5vw, 4rem);
+  --subtitle: calc(var(--heading-base) * 0.75);
+
+  /* =========================
+     BRAND COLORS
+  ========================= */
+  --color-danger-hover: #cc0000;
+  --color-success-soft: rgba(76, 175, 80, 0.05);
+  --color-danger-soft: rgba(255, 77, 79, 0.05);
+  --color-shadow-rgb: 15, 23, 42;
+  /* =========================
+     DERIVED COLORS
+  ========================= */
+  --color-text-primary: var(--color-foreground);
+  --color-surface-inverse: var(--color-foreground);
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-surface-overlay: rgba(255, 255, 255, 0.95);
+
+  /* =========================
+     SPACING SCALE
+  ========================= */
+  --space-2xs: calc(var(--space-unit) * 0.5);
+  --space-xs: var(--space-unit);
+  --space-sm: calc(var(--space-unit) * 1.5);
+  --space-md: calc(var(--space-unit) * 2.5);
+  --space-lg: calc(var(--space-unit) * 4);
+  --space-xl: calc(var(--space-unit) * 6);
+  --space-2xl: calc(var(--space-unit) * 8);
+
+  /* =========================
+     RADIUS SCALE
+  ========================= */
+  --radius-xs: calc(var(--radius-base) * 0.33);
+  --radius-sm: calc(var(--radius-base) * 0.66);
+  --radius-md: var(--radius-base);
+  --radius-lg: calc(var(--radius-base) * 1.5);
+  --radius-xl: calc(var(--radius-base) * 2);
+
+  /* =========================
+     UI TOKENS
+  ========================= */
+  --z-header: 100;
+  --z-dropdown: 200;
+  /* Header */
+  --header-height: 96px;
+  /* Icons */
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+
+  --payment-icon-width: 45px;
+  --payment-icon-height: 26px;
+  /* Layout */
+  --button-height-lg: 48px;
+  --checkout-width: 340px;
+  --control-size-sm: 32px;
+  --control-size-md: 36px;
+  --control-size-lg: 48px;
+  --control-size-xl: 56px;
+  --input-width-sm: 45px;
+  --filters-width: 240px;
+
+  /* =========================
+     COMPONENT TOKENS
+  ========================= */
+  --card-shadow: var(--shadow-md);
+  --card-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-title-scale-small: 0.9;
+  --card-title-scale-large: 1.1;
+  --card-price-scale-small: 0.9;
+  --card-price-scale-large: 1.1;
+  --card-compare-price-scale: 0.75;
+
+  /* =========================
+     SHADOWS
+  ========================= */
+  --shadow-sm:
+    0 1px 2px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5)),
+    0 2px 4px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5));
+
+  --shadow-md:
+    0 4px 6px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.4)),
+    0 10px 15px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.6));
+
+  --shadow-lg:
+    0 10px 15px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.3)),
+    0 20px 25px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5)),
+    0 25px 50px
+      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.2));
+
+  /* =========================
+     TRANSITIONS
+  ========================= */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================
+   ADAPTIVE SPACING MEDIA QUERIES
+========================= */
+@media (min-width: 768px) {
+  :root {
+    --space-2xs: calc(var(--space-unit) * 0.75);
+    --space-xs: calc(var(--space-unit) * 1.25);
+    --space-sm: calc(var(--space-unit) * 2);
+    --space-md: calc(var(--space-unit) * 3);
+    --space-lg: calc(var(--space-unit) * 5);
+    --space-xl: calc(var(--space-unit) * 7);
+    --space-2xl: calc(var(--space-unit) * 9);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 120px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --space-2xs: calc(var(--space-unit) * 0.75);
+    --space-xs: calc(var(--space-unit) * 1.5);
+    --space-sm: calc(var(--space-unit) * 2.5);
+    --space-md: calc(var(--space-unit) * 4);
+    --space-lg: calc(var(--space-unit) * 6);
+    --space-xl: calc(var(--space-unit) * 8);
+    --space-2xl: calc(var(--space-unit) * 10);
+  }
+}

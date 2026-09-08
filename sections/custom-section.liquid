@@ -1,59 +1,166 @@
-<div class="custom-section full-width">
-  {% if section.settings.background_image %}
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+<section 
+  id="custom-section-{{ sid }}" 
+  class="custom-section full-width section" 
+  data-component="custom-section"
+>
+  {% if section.settings.background_image != blank %}
     <div class="custom-section__background">
-      {{ section.settings.background_image | image_url: width: 2000 | image_tag }}
+      {% render 'image',
+        image: section.settings.background_image,
+        width: 2000,
+        wrapper_class: 'custom-section__bg-wrapper',
+        loading: 'lazy',
+        widths: '750, 1100, 1500, 2000',
+        sizes: '100vw'
+      %}
+      <div class="custom-section__overlay"></div>
     </div>
   {% endif %}
 
-  <div class="custom-section__content">
+  <div class="custom-section__content page-width">
     {% content_for 'blocks' %}
   </div>
-</div>
+</section>
 
-{% stylesheet %}
-  .custom-section {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-  }
-  .custom-section__background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-  }
-  .custom-section__background img {
-    position: absolute;
-    width: 100%;
-    height: auto;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .custom-section__content {
-    display: grid;
-    grid-template-columns: var(--content-grid);
-  }
-  .custom-section__content > * {
-    grid-column: 2;
-  }
-{% endstylesheet %}
+{% style %}
+#custom-section-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  --overlay-bg: rgba(0, 0, 0, {{ overlay_opacity }});
+  
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+#custom-section-{{ sid }} .custom-section__background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+#custom-section-{{ sid }} .custom-section__bg-wrapper,
+#custom-section-{{ sid }} .custom-section__bg-wrapper .image__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+#custom-section-{{ sid }} .custom-section__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--overlay-bg);
+  z-index: 1;
+}
+
+#custom-section-{{ sid }} .custom-section__content {
+  position: relative;
+  z-index: 2;
+  margin-inline: auto;
+}
+
+#custom-section-{{ sid }} .custom-section__content > * + * {
+  margin-top: var(--space-md, 20px);
+}
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.custom_section",
-  "blocks": [{ "type": "@theme" }],
+  "name": "Custom Section",
+  "tag": "section",
+  "class": "section-custom-wrapper",
+  "blocks": [
+    { "type": "@theme" }
+  ],
   "settings": [
     {
       "type": "image_picker",
       "id": "background_image",
-      "label": "t:labels.background"
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 48
     }
   ],
   "presets": [
     {
-      "name": "t:general.custom_section"
+      "name": "Custom Section",
+      "settings": {
+        "overlay_opacity": 0,
+        "color_mode": "theme",
+        "bg_color": "#FFFFFF",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
     }
   ]
 }

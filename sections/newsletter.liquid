@@ -1,0 +1,289 @@
+{%- assign sid = section.id -%}
+
+{%- liquid
+  assign bg_value = 'var(--color-background)'
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+  endif
+
+  assign default_title = 'sections.newsletter.title' | t
+  assign default_subtitle = 'sections.newsletter.subtitle' | t
+  assign default_placeholder = 'sections.newsletter.placeholder' | t
+  assign default_button = 'sections.newsletter.button' | t
+  assign default_success = 'sections.newsletter.success' | t
+  assign default_note = 'sections.newsletter.note' | t
+-%}
+
+<section 
+  id="newsletter-{{ sid }}" 
+  class="newsletter section"
+  data-component="newsletter"
+>
+  <div class="page-width">
+    <div class="newsletter__container">
+      
+      {% assign title_text = section.settings.title | default: default_title %}
+      {% if title_text != blank %}
+        <h2 class="newsletter__title">
+          {{ title_text | escape }}
+        </h2>
+      {% endif %}
+
+      {% assign subtitle_text = section.settings.subtitle | default: default_subtitle %}
+      {% if subtitle_text != blank %}
+        <p class="newsletter__subtitle">
+          {{ subtitle_text | escape }}
+        </p>
+      {% endif %}
+
+      {%- form 'customer', class: 'newsletter__form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+
+        {%- if form.posted_successfully? -%}
+          <p class="newsletter__success" role="status" tabindex="-1" autofocus>
+            {{ section.settings.success | default: default_success }}
+          </p>
+        {%- else -%}
+
+          <div class="newsletter__input-group">
+            <label for="NewsletterForm-{{ sid }}" class="visually-hidden">
+              {{ 'forms.email' | t | default: 'Email' }}
+            </label>
+
+            <input
+              type="email"
+              id="NewsletterForm-{{ sid }}"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="{{ section.settings.placeholder | default: default_placeholder }}"
+              required
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+            >
+
+            <button type="submit" name="commit" class="btn btn--primary">
+              {{ section.settings.button_label | default: default_button }}
+            </button>
+          </div>
+
+          {%- if form.errors -%}
+            <p class="newsletter__error">
+              {{ form.errors | default_errors }}
+            </p>
+          {%- endif -%}
+
+        {%- endif -%}
+      {%- endform -%}
+
+      {% assign note_text = section.settings.note | default: default_note %}
+      {% if note_text != blank %}
+        <p class="newsletter__note">
+          {{ note_text | escape }}
+        </p>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+
+{% style %}
+#newsletter-{{ sid }} {
+  --section-bg: {{ bg_value }};
+  background: var(--section-bg);
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+  text-align: center;
+}
+
+#newsletter-{{ sid }} .newsletter__container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+#newsletter-{{ sid }} .newsletter__title {
+  margin: 0 0 var(--space-xs, 8px);
+  font-size: var(--heading-md, 28px);
+  font-weight: var(--font-weight-bold, 700);
+}
+
+#newsletter-{{ sid }} .newsletter__subtitle {
+  margin: 0 0 var(--space-md, 16px);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base, 16px);
+}
+
+#newsletter-{{ sid }} .newsletter__form {
+  margin-top: var(--space-lg, 24px);
+}
+
+#newsletter-{{ sid }} .newsletter__input-group {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm, 12px);
+}
+
+#newsletter-{{ sid }} input[type="email"] {
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  min-width: 300px;
+  flex: 1;
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#newsletter-{{ sid }} input[type="email"]:focus {
+  outline: none;
+  border-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--color-text-primary);
+}
+
+#newsletter-{{ sid }} button {
+  white-space: nowrap;
+}
+
+#newsletter-{{ sid }} .newsletter__success {
+  color: var(--color-success, #2e7d32);
+  background: var(--color-success-soft, #e8f5e9);
+  border: 1px solid var(--color-success, #2e7d32);
+  padding: 15px 20px;
+  border-radius: var(--radius-sm, 4px);
+  display: inline-block;
+  margin: 0 auto;
+}
+
+#newsletter-{{ sid }} .newsletter__error {
+  color: var(--color-danger, #d32f2f);
+  background: var(--color-danger-soft, #ffebee);
+  border: 1px solid var(--color-danger, #d32f2f);
+  margin-top: var(--space-md, 16px);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--font-size-sm, 14px);
+}
+
+#newsletter-{{ sid }} .newsletter__note {
+  margin-top: var(--space-md, 16px);
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  #newsletter-{{ sid }} .newsletter__input-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #newsletter-{{ sid }} input[type="email"],
+  #newsletter-{{ sid }} button {
+    width: 100%;
+    min-width: unset;
+    max-width: 400px;
+  }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "section",
+  "class": "section-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Join our community"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Get updates and special offers"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Email placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "textarea",
+      "id": "success",
+      "label": "Success message",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "textarea",
+      "id": "note",
+      "label": "Note under form",
+      "default": "We respect your privacy"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Spacing"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Custom background",
+      "default": "#F9F9F9"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    { 
+      "name": "Newsletter",
+      "settings": {
+        "title": "Join our community",
+        "subtitle": "Get updates and special offers",
+        "placeholder": "Your email address",
+        "button_label": "Subscribe",
+        "success": "Thanks for subscribing!",
+        "note": "We respect your privacy",
+        "color_mode": "theme",
+        "bg_color": "#F9F9F9",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  ]
+}
+{% endschema %}

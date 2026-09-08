@@ -1,42 +1,97 @@
 [
   {
-    "name": "theme_info",
-    "theme_name": "Skeleton",
-    "theme_version": "0.1.0",
-    "theme_author": "Shopify",
-    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
-    "theme_support_url": "https://support.shopify.com/"
-  },
-  {
-    "name": "t:general.typography",
+    "name": "Typography",
     "settings": [
       {
         "type": "header",
-        "content": "t:general.fonts"
+        "content": "Fonts"
       },
       {
         "type": "font_picker",
         "id": "type_primary_font",
         "default": "work_sans_n4",
-        "label": "t:general.primary"
+        "label": "Primary font (Body & UI)"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_secondary_font",
+        "default": "work_sans_n6",
+        "label": "Secondary font (Headings & Accent)"
+      },
+      {
+        "type": "range",
+        "id": "heading_base_size",
+        "min": 16,
+        "max": 48,
+        "step": 2,
+        "unit": "px",
+        "label": "Base heading size",
+        "default": 28
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "label": "Heading scale",
+        "default": 1.2
       }
     ]
   },
   {
-    "name": "t:general.layout",
+    "name": "Border Radius",
     "settings": [
+      {
+        "type": "range",
+        "id": "radius_base",
+        "label": "Base radius",
+        "min": 0,
+        "max": 24,
+        "step": 2,
+        "unit": "px",
+        "default": 12
+      }
+    ]
+  },
+  {
+    "name": "Spacing",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Spacing Scale"
+      },
+      {
+        "type": "range",
+        "id": "spacing_base",
+        "label": "Base spacing",
+        "min": 4,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "default": 8
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Page Layout"
+      },
       {
         "type": "select",
         "id": "max_page_width",
-        "label": "t:labels.page_width",
+        "label": "Maximum page width",
         "options": [
           {
             "value": "90rem",
-            "label": "t:options.page_width.narrow"
+            "label": "Narrow"
           },
           {
             "value": "110rem",
-            "label": "t:options.page_width.wide"
+            "label": "Wide"
           }
         ],
         "default": "90rem"
@@ -48,35 +103,295 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "t:labels.page_margin",
+        "label": "Minimum page margin",
         "default": 20
       }
     ]
   },
   {
-    "name": "t:general.colors",
+    "name": "Colors",
     "settings": [
+      {
+        "type": "header",
+        "content": "Global Site Background"
+      },
       {
         "type": "color",
         "id": "background_color",
         "default": "#FFFFFF",
-        "label": "t:labels.background"
+        "label": "Fallback Background Color",
+        "info": "Used as base background and during image loading."
+      },
+      {
+        "type": "image_picker",
+        "id": "site_background_image",
+        "label": "Background Image / SVG Pattern"
+      },
+      {
+        "type": "select",
+        "id": "site_background_size",
+        "label": "Image Size & Scale",
+        "options": [
+          { "value": "cover", "label": "Fill Screen (Cover)" },
+          { "value": "contain", "label": "Fit Screen (Contain)" },
+          { "value": "auto", "label": "Original / Tile (Repeat)" }
+        ],
+        "default": "cover"
+      },
+      {
+        "type": "color",
+        "id": "site_background_overlay_color",
+        "default": "#000000",
+        "label": "Background Overlay Color",
+        "info": "Choose the color that masks your background image or video."
+      },
+      {
+        "type": "range",
+        "id": "site_background_overlay",
+        "min": 0,
+        "max": 95,
+        "step": 5,
+        "unit": "%",
+        "label": "Background Overlay Opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "site_background_blur",
+        "min": 0,
+        "max": 20,
+        "step": 2,
+        "unit": "px",
+        "label": "Background Backdrop Blur",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Advanced: Global Video Background"
+      },
+      {
+        "type": "paragraph",
+        "content": "⚠️ **Performance Warning:** Global video background impacts Core Web Vitals. Optimize files under 10MB."
+      },
+      {
+        "type": "video",
+        "id": "site_background_video",
+        "label": "Global Background Video",
+        "info": "Overrides image if selected. Plays muted and looped."
+      },
+      {
+        "type": "header",
+        "content": "Core Surface & Text Colors"
       },
       {
         "type": "color",
         "id": "foreground_color",
-        "default": "#333333",
-        "label": "t:labels.foreground"
+        "default": "#121212",
+        "label": "Primary Text & Foreground"
+      },
+      {
+        "type": "color",
+        "id": "accent_color",
+        "default": "#E41616",
+        "label": "Accent Color"
+      },
+      {
+        "type": "color",
+        "id": "surface_color",
+        "label": "Surface (Cards, Dialogs)",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "surface_subtle_color",
+        "label": "Surface Subtle",
+        "default": "#F5F5F5"
+      },
+      {
+        "type": "color",
+        "id": "surface_hover_color",
+        "label": "Surface Hover",
+        "default": "#F3F3F3"
+      },
+      {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border Color",
+        "default": "rgba(0,0,0,0.05)"
+      },
+      {
+        "type": "color",
+        "id": "text_secondary_color",
+        "label": "Secondary Text",
+        "default": "#444444"
+      },
+      {
+        "type": "color",
+        "id": "text_muted_color",
+        "label": "Muted Text",
+        "default": "#777777"
+      },
+      {
+        "type": "color",
+        "id": "success_color",
+        "label": "Success Status",
+        "default": "#4CAF50"
+      },
+      {
+        "type": "color",
+        "id": "danger_color",
+        "label": "Danger / Error Status",
+        "default": "#FF4D4F"
+      },
+      {
+        "type": "color",
+        "id": "rating_color",
+        "label": "Rating / Stars",
+        "default": "#FFB800"
+      }
+    ]
+  },
+  {
+    "name": "Product Cards",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Card Appearance"
+      },
+      {
+        "type": "color",
+        "id": "card_bg_color",
+        "label": "Card background color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "select",
+        "id": "card_text_alignment",
+        "label": "Text alignment",
+        "options": [
+          { "value": "left", "label": "Left" },
+          { "value": "center", "label": "Center" }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "header",
+        "content": "Functionality"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_secondary_image",
+        "label": "Show second image on hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show product vendor",
+        "default": true
       },
       {
         "type": "range",
-        "id": "input_corner_radius",
+        "id": "card_shadow_opacity",
         "min": 0,
-        "max": 10,
+        "max": 50,
+        "step": 5,
+        "unit": "%",
+        "label": "Card shadow intensity",
+        "default": 10
+      },
+      {
+        "type": "select",
+        "id": "image_ratio",
+        "label": "Image ratio",
+        "options": [
+          { "value": "1/1", "label": "Square" },
+          { "value": "3/4", "label": "Portrait" },
+          { "value": "4/3", "label": "Landscape" }
+        ],
+        "default": "1/1"
+      },
+      {
+        "type": "select",
+        "id": "image_fit",
+        "label": "Image fit",
+        "options": [
+          { "value": "cover", "label": "Fill (Cover)" },
+          { "value": "contain", "label": "Show all (Contain)" }
+        ],
+        "default": "cover"
+      },
+      {
+        "type": "range",
+        "id": "card_title_size",
+        "min": 12,
+        "max": 24,
         "step": 1,
         "unit": "px",
-        "label": "t:labels.input_corner_radius",
-        "default": 4
+        "label": "Product title size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "card_price_size",
+        "min": 14,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "label": "Product price size",
+        "default": 18
+      },
+      {
+        "type": "range",
+        "id": "card_padding",
+        "min": 4,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Card padding",
+        "default": 12
+      }
+    ]
+  },
+  {
+    "name": "Reset to Defaults & Support",
+    "settings": [
+      {
+        "type": "header",
+        "content": "🔄 Revert to Factory Defaults"
+      },
+      {
+        "type": "paragraph",
+        "content": "Need to start over? You can instantly reset all theme settings back to factory defaults."
+      },
+      {
+        "type": "paragraph",
+        "content": "👉 **How to Reset:** Click **Theme actions** (bottom-left corner of Theme Editor) → **Theme styles** → select **Default** → click **Change theme style**."
+      },
+      {
+        "type": "header",
+        "content": "📚 Help & Documentation"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Read Framework Documentation](https://myportfolio.com)"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Contact Developer Support](mailto:emecvl@gmail.com)"
+      }
+    ]
+  },
+  {
+    "name": "Theme Information",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Peak Framework v1.0.0"
+      },
+      {
+        "type": "paragraph",
+        "content": "Author: Vyacheslav Emec"
       }
     ]
   }

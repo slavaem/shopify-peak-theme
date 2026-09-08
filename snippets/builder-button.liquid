@@ -1,0 +1,100 @@
+{% doc %}
+  Builder Button
+
+  Reusable CTA button component.
+
+  To use this snippet inside a section:
+  
+  1. Add a button block to the section schema.
+  2. The block should provide:
+     - label
+     - link
+     - style
+     - alignment
+
+  3. Render the snippet from the section:
+
+     {% render 'builder-button', block: block %}
+
+  Required block settings:
+
+     alignment:
+       left
+       center
+       right
+
+  The corresponding alignment classes are:
+     .builder__button-wrapper--left
+     .builder__button-wrapper--center
+     .builder__button-wrapper--right
+
+  Example block schema:
+
+  {
+    "type": "button",
+    "name": "Button",
+    "settings": [
+      {
+        "type": "text",
+        "id": "label",
+        "label": "Label"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      },
+      {
+        "type": "select",
+        "id": "style",
+        "label": "Style",
+        "options": [
+          { "value": "primary", "label": "Primary" },
+          { "value": "secondary", "label": "Secondary" }
+        ],
+        "default": "primary"
+      },
+      {
+        "type": "select",
+        "id": "alignment",
+        "label": "Alignment",
+        "options": [
+          { "value": "left", "label": "Left" },
+          { "value": "center", "label": "Center" },
+          { "value": "right", "label": "Right" }
+        ],
+        "default": "left"
+      }
+    ]
+  }
+{% enddoc %}
+
+{% if block.settings.label != blank and block.settings.link != blank %}
+  <div class="builder__button-wrapper builder__button-wrapper--{{ block.settings.alignment | default: 'left' }}">
+    <a
+      href="{{ block.settings.link }}"
+      class="btn btn--{{ block.settings.style | default: 'primary' }}"
+    >
+      {{ block.settings.label | escape }}
+    </a>
+  </div>
+{% endif %}
+
+{% style %}
+.builder__button-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.builder__button-wrapper--left {
+  justify-content: flex-start;
+}
+
+.builder__button-wrapper--center {
+  justify-content: center;
+}
+
+.builder__button-wrapper--right {
+  justify-content: flex-end;
+}
+{% endstyle %}
