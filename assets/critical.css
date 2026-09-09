@@ -152,8 +152,8 @@ h6,
  */
 .shopify-section {
   --content-width: min(
-    calc((var(--page-width, 1200px)) - (var(--page-margin, 20px) * 2)),
-    calc(100% - (var(, 20px) * 2))
+    calc(var(--page-width, 1200px) - (var(--page-margin, 20px) * 2)),
+    calc(100% - (var(--page-margin, 20px) * 2))
   );
 
   --content-margin: minmax(var(--page-margin, 20px), 1fr);
@@ -168,10 +168,12 @@ h6,
 /* Child elements constrained to the central column. */
 .shopify-section > * {
   grid-column: 2;
+  width: 100%;
 }
 
 /* Child elements that use the full-width utility class span the entire viewport. */
-.shopify-section > .full-width {
+.shopify-section > .full-width,
+.shopify-section > .video-hero-wrapper {
   grid-column: 1 / -1;
 }
 

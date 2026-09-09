@@ -45,7 +45,8 @@
   --color-danger-hover: #cc0000;
   --color-success-soft: rgba(76, 175, 80, 0.05);
   --color-danger-soft: rgba(255, 77, 79, 0.05);
-  --color-shadow-rgb: 15, 23, 42;
+  --color-shadow-rgb: 15 23 42;
+
   /* =========================
      DERIVED COLORS
   ========================= */
@@ -79,8 +80,10 @@
   ========================= */
   --z-header: 100;
   --z-dropdown: 200;
+
   /* Header */
   --header-height: 96px;
+
   /* Icons */
   --icon-size-sm: 16px;
   --icon-size-md: 20px;
@@ -88,6 +91,7 @@
 
   --payment-icon-width: 45px;
   --payment-icon-height: 26px;
+
   /* Layout */
   --button-height-lg: 48px;
   --checkout-width: 340px;
@@ -110,27 +114,27 @@
   --card-compare-price-scale: 0.75;
 
   /* =========================
-     SHADOWS
+     SHADOWS (Исправлен синтаксис rgba)
   ========================= */
   --shadow-sm:
     0 1px 2px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5)),
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.5)),
     0 2px 4px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5));
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.5));
 
   --shadow-md:
     0 4px 6px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.4)),
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.4)),
     0 10px 15px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.6));
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.6));
 
   --shadow-lg:
     0 10px 15px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.3)),
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.3)),
     0 20px 25px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.5)),
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.5)),
     0 25px 50px
-      rgba(var(--color-shadow-rgb), calc(var(--card-shadow-opacity) * 0.2));
+      rgb(var(--color-shadow-rgb) / calc(var(--card-shadow-opacity, 0.1) * 0.2));
 
   /* =========================
      TRANSITIONS

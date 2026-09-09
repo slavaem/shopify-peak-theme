@@ -1,15 +1,39 @@
 /* ==========================================================================
-   BASE STYLES 
+   BASE STYLES (Peak Framework)
    ========================================================================== */
 
+/* Native View Transitions for smooth page-to-page navigation */
 @view-transition {
   navigation: auto;
 }
 
+/* Reset focus outline for dialog elements only */
 dialog:focus {
   outline: none;
 }
 
-[hidden] {
+/* Utility to ensure hidden elements are never rendered */
+[hidden],
+.hidden {
   display: none !important;
+}
+
+/* Accessibility utility for screen readers */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Unstyled list resets for navigation & components */
+.list-unstyled {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }

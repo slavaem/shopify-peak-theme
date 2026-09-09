@@ -2,9 +2,10 @@
    PAGE (CONTENT LAYER)
    ========================================================================== */
 
-/* PAGE intro */
+/* PAGE INTRO */
 .page-intro {
-  max-width: 720px;
+  max-width: var(--content-width-narrow);
+  margin-inline: auto;
   margin-block-end: var(--space-lg);
   text-align: center;
 }
@@ -99,7 +100,7 @@
 
 .builder__subtitle {
   font-size: var(--subtitle);
-  max-width: 640px;
+  max-width: var(--content-width-narrow);
 }
 
 /* MEDIA */
@@ -178,7 +179,7 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-block;
-  transition: var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .variant input:checked + span {

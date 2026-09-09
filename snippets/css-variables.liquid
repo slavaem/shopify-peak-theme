@@ -44,36 +44,36 @@
        COLORS and BACKGROUND
     ========================= */
 
-         {% if settings.site_background_image != blank %}
-         {% if settings.site_background_image.src contains '.svg' %}
-            --site-background-image: url({{ settings.site_background_image | image_url }});
-         {% else %}
-            --site-background-image: url({{ settings.site_background_image | image_url: width: 2000 }});
-         {% endif %}
-         --site-background-size: {{ settings.site_background_size }};
-         --site-background-repeat: {% if settings.site_background_size == 'auto' %}repeat{% else %}no-repeat{% endif %};
-         --site-background-attachment: {% if settings.site_background_size == 'cover' %}fixed{% else %}scroll{% endif %};
+    {% if settings.site_background_image != blank %}
+      {% if settings.site_background_image.src contains '.svg' %}
+        --site-background-image: url({{ settings.site_background_image | image_url }});
       {% else %}
-         --site-background-image: none;
-         --site-background-size: cover;
-         --site-background-repeat: no-repeat;
-         --site-background-attachment: fixed;
+        --site-background-image: url({{ settings.site_background_image | image_url: width: 2000 }});
       {% endif %}
+      --site-background-size: {{ settings.site_background_size }};
+      --site-background-repeat: {% if settings.site_background_size == 'auto' %}repeat{% else %}no-repeat{% endif %};
+      --site-background-attachment: {% if settings.site_background_size == 'cover' %}fixed{% else %}scroll{% endif %};
+    {% else %}
+      --site-background-image: none;
+      --site-background-size: cover;
+      --site-background-repeat: no-repeat;
+      --site-background-attachment: fixed;
+    {% endif %}
 
-      /* Isolated Layer Effects (body::before tokens) */
-      {% if settings.site_background_image != blank or settings.site_background_video != blank %}
-            --site-background-overlay: rgb(
-            {{ settings.site_background_overlay_color.rgb }} / {{ settings.site_background_overlay | divided_by: 100.0 | default: 0 }}
-            );
-         {% if settings.site_background_blur > 0 %}
-            --site-background-blur: blur({{ settings.site_background_blur }}px);
-         {% else %}
-            --site-background-blur: none;
-         {% endif %}
+    /* Isolated Layer Effects (body::before tokens) */
+    {% if settings.site_background_image != blank or settings.site_background_video != blank %}
+      --site-background-overlay: rgb(
+        {{ settings.site_background_overlay_color.rgb | default: '0 0 0' }} / {{ settings.site_background_overlay | divided_by: 100.0 | default: 0 }}
+      );
+      {% if settings.site_background_blur > 0 %}
+        --site-background-blur: blur({{ settings.site_background_blur }}px);
       {% else %}
-         --site-background-overlay: transparent;
-         --site-background-blur: none;
+        --site-background-blur: none;
       {% endif %}
+    {% else %}
+      --site-background-overlay: transparent;
+      --site-background-blur: none;
+    {% endif %}
 
     --color-background: {{ settings.background_color }};
     --color-foreground: {{ settings.foreground_color }};
@@ -104,14 +104,14 @@
     --card-title-size: {{ settings.card_title_size | default: 16 }}px;
     --card-price-size: {{ settings.card_price_size | default: 18 }}px;
 
-    --card-padding: {{ settings.card_padding }}px;
+    --card-padding: {{ settings.card_padding | default: 16 }}px;
 
-    --card-text-align: {{ settings.card_text_alignment }};
-   {% if settings.card_text_alignment == 'center' %}
-   --card-flex-align: center;
-   {% else %}
-   --card-flex-align: flex-start;
-   {% endif %}
+    --card-text-align: {{ settings.card_text_alignment | default: 'left' }};
+    {% if settings.card_text_alignment == 'center' %}
+      --card-flex-align: center;
+    {% else %}
+      --card-flex-align: flex-start;
+    {% endif %}
 
     /* Image settings */
     --card-image-ratio: {{ settings.image_ratio | default: '1/1' }};
