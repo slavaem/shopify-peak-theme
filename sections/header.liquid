@@ -37,7 +37,9 @@
           alt: shop.name
         %}
       {% else %}
-        <span class="header__logo-text">{{ shop.name }}</span>
+        <span class="header__logo-text">
+        PEAK<span class="logo-accent">.</span>
+        </span>
       {% endif %}
     </a>
   </div>
@@ -196,8 +198,21 @@
 
 .header__burger-btn { grid-area: burger-zone; justify-self: start; display: none; }
 .header__title { grid-area: logo-zone; justify-self: start; display: flex; max-width: 100%; min-width: 0; }
-.header__logo-text { font-size: var(--font-size-xl, 22px); font-weight: var(--font-weight-bold, 700); }
+.header__logo-text {
+  font-family: var(--font-family-heading, var(--font-primary--family));
+  font-size: var(--font-size-xl, 22px);
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
 
+.header__logo-text .logo-accent {
+  color: var(--color-accent);
+}
 .header__menu {
   grid-area: menu-zone;
   display: flex;

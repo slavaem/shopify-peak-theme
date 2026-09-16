@@ -7,6 +7,11 @@
   if section.settings.color_mode == 'custom'
     assign bg_value = section.settings.bg_color
   endif
+
+  assign has_valid_blocks = false
+  if section.blocks.size > 0
+    assign has_valid_blocks = true
+  endif
 -%}
 
 <section 
@@ -25,71 +30,68 @@
     {% endif %}
 
     <div class="masonry-grid">
-      {% if section.blocks.size > 0 %}
+      {% if has_valid_blocks %}
         {% for block in section.blocks %}
           {% case block.type %}
             {% when 'product' %}
               {% assign product = block.settings.product %}
               {% assign m_image = block.settings.image | default: product.featured_image %}
               
-              {% if product != blank or is_design_mode %}
-                <div class="masonry-item" {{ block.shopify_attributes }}>
-                  {% assign v = product.selected_or_first_available_variant %}
-                  <div class="masonry-card"
-                    data-action="quick-view-open"
-                    data-id="{{ v.id | default: 123456 }}"
-                    data-title="{{ product.title | default: 'Example Product Title' | escape }}"
-                    data-price="{{ product.price | default: 9900 | money }}"
-                    data-img="{% if m_image %}{{ m_image | image_url: width: 800 }}{% endif %}"
-                    data-desc="{{ product.description | default: 'Example product description text for quick view modal window.' | strip_html | truncatewords: 20 | escape }}"
-                    data-url="{{ product.url | default: '#' }}"
-                  >
+              <div class="masonry-item" {{ block.shopify_attributes }}>
+                {% assign v = product.selected_or_first_available_variant %}
+                <div class="masonry-card"
+                  data-action="quick-view-open"
+                  data-id="{{ v.id | default: 123456 }}"
+                  data-title="{{ product.title | default: 'Sample Snowboard Equipment' | escape }}"
+                  data-price="{{ product.price | default: 19900 | money }}"
+                  data-img="{% if m_image %}{{ m_image | image_url: width: 800 }}{% endif %}"
+                  data-desc="{{ product.description | default: 'Premium handcrafted equipment built for speed, durability, and ultimate control.' | strip_html | truncatewords: 20 | escape }}"
+                  data-url="{{ product.url | default: '#' }}"
+                >
 
-                    {% if m_image %}
-                      {% render 'image',
-                        image: m_image,
-                        width: 800,
-                        wrapper_class: 'masonry-img-wrapper',
-                        loading: 'lazy'
-                      %}
-                    {% else %}
-                      <div class="masonry-placeholder">
-                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                      </div>
-                    {% endif %}
-
-                    <div class="masonry-overlay">
-                      <span>{{ 'sections.masonry_gallery.quick_view' | t | default: 'Quick View' }}</span>
+                  {% if m_image %}
+                    {% render 'image',
+                      image: m_image,
+                      width: 800,
+                      wrapper_class: 'masonry-img-wrapper',
+                      loading: 'lazy'
+                    %}
+                  {% else %}
+                    <div class="masonry-placeholder">
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
                     </div>
+                  {% endif %}
+
+                  <div class="masonry-overlay">
+                    <span>{{ 'sections.masonry_gallery.quick_view' | t | default: 'Quick View' }}</span>
                   </div>
                 </div>
-              {% endif %}
+              </div>
 
             {% when 'image' %}
               {% assign m_image = block.settings.image %}
-              {% if m_image != blank or is_design_mode %}
-                <div class="masonry-item" {{ block.shopify_attributes }}>
-                  <div class="masonry-card masonry-static">
-                    {% if m_image %}
-                      {% render 'image',
-                        image: m_image,
-                        width: 800,
-                        wrapper_class: 'masonry-img-wrapper',
-                        loading: 'lazy'
-                      %}
-                    {% else %}
-                      <div class="masonry-placeholder">
-                        {{ 'collection-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                      </div>
-                    {% endif %}
-                  </div>
+              <div class="masonry-item" {{ block.shopify_attributes }}>
+                <div class="masonry-card masonry-static">
+                  {% if m_image %}
+                    {% render 'image',
+                      image: m_image,
+                      width: 800,
+                      wrapper_class: 'masonry-img-wrapper',
+                      loading: 'lazy'
+                    %}
+                  {% else %}
+                    <div class="masonry-placeholder">
+                      {% assign svg_index = forloop.index | modulo: 4 | plus: 1 %}
+                      {{ 'collection-apparel-' | append: svg_index | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                  {% endif %}
                 </div>
-              {% endif %}
+              </div>
           {% endcase %}
         {% endfor %}
 
-      {% elsif is_design_mode %}
-        {% for i in (1..4) %}
+      {% else %}
+     {% for i in (1..4) %}
           <div class="masonry-item">
             <div class="masonry-card masonry-static">
               <div class="masonry-placeholder">
@@ -147,6 +149,7 @@
   overflow: hidden; 
   border-radius: var(--radius-md);
   background: var(--color-surface-subtle); 
+  border: 1px solid var(--color-border);
 }
 
 #masonry-{{ sid }} .masonry-static {
@@ -160,6 +163,19 @@
   height: auto;
   display: block;
   object-fit: cover;
+}
+
+#masonry-{{ sid }} .masonry-placeholder {
+  padding: var(--space-lg);
+  background: var(--color-surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#masonry-{{ sid }} .masonry-placeholder svg {
+  max-width: 180px;
+  opacity: 0.4;
 }
 
 #masonry-{{ sid }} .masonry-card img {
@@ -375,7 +391,6 @@
         const addedItem = await res.json();
         modal.close();
 
-        // Trigger global cart update and open toast notification
         document.dispatchEvent(new CustomEvent('cart:updated', { detail: addedItem }));
 
       } catch (err) {

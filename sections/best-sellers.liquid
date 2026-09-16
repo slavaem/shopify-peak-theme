@@ -15,6 +15,10 @@
     
     assign section_label = section.settings.section_label | default: default_label
     assign section_title = section.settings.title | default: default_title
+    assign has_blocks = false
+    if section.blocks.size > 0
+      assign has_blocks = true
+    endif
   -%}
 
   <div class="page-width">
@@ -24,13 +28,13 @@
         <!-- NAVIGATION -->
         <div class="nav-col">
           <div class="header-group">
-            {% if section.settings.section_label != blank %}
+            {% if section_label != blank %}
               <span class="label">
                 {{ section_label }}
               </span>
             {% endif %}
             
-            {% if section.settings.title != blank %}
+            {% if section_title != blank %}
               <h2 class="title" id="title-{{ sid }}">
                 {{ section_title }}
               </h2>
@@ -44,77 +48,122 @@
               aria-labelledby="title-{{ sid }}"
               data-tabs-nav
             >
-              {% for block in section.blocks %}
-                {% liquid
-                  assign fallback_text = 'sections.best_sellers.collection_fallback' | t | default: 'Collection'
-                  assign nav_title = block.settings.collection.title
+              {% if has_blocks %}
+                {% for block in section.blocks %}
+                  {% liquid
+                    assign fallback_text = 'sections.best_sellers.collection_fallback' | t | default: 'Collection'
+                    assign nav_title = block.settings.collection.title
 
-                  if block.settings.collection_title != blank
-                    assign nav_title = block.settings.collection_title
-                  endif
+                    if block.settings.collection_title != blank
+                      assign nav_title = block.settings.collection_title
+                    endif
 
-                  assign nav_title = nav_title | default: fallback_text
-                  assign is_first = forloop.first
-                %}
-                <li role="presentation" {{ block.shopify_attributes }}>
-                  <button
-                    id="tab-{{ sid }}-{{ forloop.index0 }}"
-                    class="nav-btn {% if is_first %}active{% endif %}"
-                    role="tab"
-                    aria-selected="{% if is_first %}true{% else %}false{% endif %}"
-                    aria-controls="panel-{{ sid }}-{{ forloop.index0 }}"
-                    tabindex="{% if is_first %}0{% else %}-1{% endif %}"
-                    data-index="{{ forloop.index0 }}"
-                    data-action="tab-switch"
-                    type="button"
-                  >
-                    <span class="nav-text">{{ nav_title }}</span>
+                    assign nav_title = nav_title | default: fallback_text
+                    assign is_first = forloop.first
+                  %}
+                  <li role="presentation" {{ block.shopify_attributes }}>
+                    <button
+                      id="tab-{{ sid }}-{{ forloop.index0 }}"
+                      class="nav-btn {% if is_first %}active{% endif %}"
+                      role="tab"
+                      aria-selected="{% if is_first %}true{% else %}false{% endif %}"
+                      aria-controls="panel-{{ sid }}-{{ forloop.index0 }}"
+                      tabindex="{% if is_first %}0{% else %}-1{% endif %}"
+                      data-index="{{ forloop.index0 }}"
+                      data-action="tab-switch"
+                      type="button"
+                    >
+                      <span class="nav-text">{{ nav_title }}</span>
+                      <span class="nav-arrow" aria-hidden="true">→</span>
+                    </button>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li role="presentation">
+                  <button id="tab-{{ sid }}-0" class="nav-btn active" role="tab" aria-selected="true" aria-controls="panel-{{ sid }}-0" tabindex="0" data-index="0" data-action="tab-switch" type="button">
+                    <span class="nav-text">New Arrivals</span>
                     <span class="nav-arrow" aria-hidden="true">→</span>
                   </button>
                 </li>
-              {% endfor %}
+                <li role="presentation">
+                  <button id="tab-{{ sid }}-1" class="nav-btn" role="tab" aria-selected="false" aria-controls="panel-{{ sid }}-1" tabindex="-1" data-index="1" data-action="tab-switch" type="button">
+                    <span class="nav-text">Most Popular</span>
+                    <span class="nav-arrow" aria-hidden="true">→</span>
+                  </button>
+                </li>
+              {% endif %}
             </ul>
           </nav>
         </div>
 
         <!-- CONTENT -->
         <div class="content-col">
-          {% for block in section.blocks %}
-            {% liquid
-              assign product = blank
-              assign is_first = forloop.first
+          {% if has_blocks %}
+            {% for block in section.blocks %}
+              {% liquid
+                assign product = blank
+                assign is_first = forloop.first
 
-              if block.settings.product != blank
-                assign product = block.settings.product
-              elsif block.settings.collection != blank and block.settings.collection.products.size > 0
-                assign product = block.settings.collection.products.first
-              endif
-            %}
+                if block.settings.product != blank
+                  assign product = block.settings.product
+                elsif block.settings.collection != blank and block.settings.collection.products.size > 0
+                  assign product = block.settings.collection.products.first
+                endif
+              %}
 
-            <div
-              id="panel-{{ sid }}-{{ forloop.index0 }}"
-              class="tab-panel {% if is_first %}active{% endif %}"
-              role="tabpanel"
-              aria-labelledby="tab-{{ sid }}-{{ forloop.index0 }}"
-              tabindex="0"
-              {% unless is_first %}hidden{% endunless %}
-              data-index="{{ forloop.index0 }}"
-              data-tab-panel
-              {{ block.shopify_attributes }}
-            >
-              {% if product != blank %}
-                {% render 'product-card', product_item: product, show_vendor: true %}
-              {% else %}
-                <div class="best-sellers__placeholder-card">
-                  {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                  <div class="placeholder-card__info">
-                    <p class="placeholder-card__title">Product Title</p>
-                    <p class="placeholder-card__price">$99.00</p>
+              <div
+                id="panel-{{ sid }}-{{ forloop.index0 }}"
+                class="tab-panel {% if is_first %}active{% endif %}"
+                role="tabpanel"
+                aria-labelledby="tab-{{ sid }}-{{ forloop.index0 }}"
+                tabindex="0"
+                {% unless is_first %}hidden{% endunless %}
+                data-index="{{ forloop.index0 }}"
+                data-tab-panel
+                {{ block.shopify_attributes }}
+              >
+                {% if product != blank %}
+                  {% render 'product-card', product_item: product, show_vendor: true %}
+                {% else %}
+                  <div class="best-sellers__placeholder-card">
+                    <div class="placeholder-card__image">
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                    <div class="placeholder-card__info">
+                      <p class="placeholder-card__vendor">Peak Studio</p>
+                      <p class="placeholder-card__title">Sample Snowboard Equipment</p>
+                      <p class="placeholder-card__price">$199.00</p>
+                    </div>
                   </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <div id="panel-{{ sid }}-0" class="tab-panel active" role="tabpanel" aria-labelledby="tab-{{ sid }}-0" tabindex="0" data-index="0" data-tab-panel>
+              <div class="best-sellers__placeholder-card">
+                <div class="placeholder-card__image">
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
                 </div>
-              {% endif %}
+                <div class="placeholder-card__info">
+                  <p class="placeholder-card__vendor">Peak Studio</p>
+                  <p class="placeholder-card__title">Sample Premium Snowboard</p>
+                  <p class="placeholder-card__price">$499.00</p>
+                </div>
+              </div>
             </div>
-          {% endfor %}
+            <div id="panel-{{ sid }}-1" class="tab-panel" role="tabpanel" aria-labelledby="tab-{{ sid }}-1" tabindex="0" hidden data-index="1" data-tab-panel>
+              <div class="best-sellers__placeholder-card">
+                <div class="placeholder-card__image">
+                  {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+                <div class="placeholder-card__info">
+                  <p class="placeholder-card__vendor">Peak Studio</p>
+                  <p class="placeholder-card__title">Pro Rider Helmet & Goggles</p>
+                  <p class="placeholder-card__price">$129.00</p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
 
       </div>
@@ -240,11 +289,51 @@
   }
 
   #section-{{ sid }} .best-sellers__placeholder-card {
-    border: 1px dashed var(--color-border);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: var(--space-md);
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+
+  #section-{{ sid }} .placeholder-card__image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
     background: var(--color-surface-subtle);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #section-{{ sid }} .placeholder-card__image svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.4;
+  }
+
+  #section-{{ sid }} .placeholder-card__info {
+    padding: var(--space-md);
+    text-align: left;
+  }
+
+  #section-{{ sid }} .placeholder-card__vendor {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2xs);
+  }
+
+  #section-{{ sid }} .placeholder-card__title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-foreground);
+    margin-bottom: var(--space-xs);
+  }
+
+  #section-{{ sid }} .placeholder-card__price {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
   }
 
   @container best_sellers (max-width: 767px) {
@@ -300,7 +389,6 @@
             panel.removeAttribute('hidden');
             panel.classList.add('active');
 
-            // Подгружаем lazy-картинки и триггерим перерасчет размеров
             panel.querySelectorAll('img[loading="lazy"]').forEach(img => {
               img.removeAttribute('loading');
             });
@@ -314,12 +402,10 @@
         newTab.focus();
       }
 
-      // Mouse click event
       tabs.forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab));
       });
 
-      // Keyboard Navigation
       root.querySelector('[role="tablist"]')?.addEventListener('keydown', (e) => {
         const currentTab = document.activeElement;
         if (!tabs.includes(currentTab)) return;

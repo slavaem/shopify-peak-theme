@@ -1,8 +1,6 @@
 {%- assign sid = section.id -%}
 
 {%- liquid
-  assign is_design_mode = request.design_mode
-
   assign bg_value = 'var(--color-surface-inverse)'
   assign text_value = 'var(--color-background)'
 
@@ -17,7 +15,7 @@
     assign active_columns = active_columns | plus: 1
   endif
 
-  if section.settings.show_menu and section.settings.menu != blank or is_design_mode
+  if section.settings.show_menu
     assign active_columns = active_columns | plus: 1
   endif
 
@@ -47,10 +45,12 @@
                 width: section.settings.logo_width,
                 wrapper_class: 'footer__logo-wrapper',
                 loading: 'lazy',
-                alt: shop.name
+                alt: 'PEAK Framework'
               %}
             {% else %}
-              <span class="footer__brand-title">{{ shop.name }}</span>
+              <span class="footer__brand-title">
+                PEAK<span class="logo-accent">.</span>
+              </span>
             {% endif %}
           </div>
 
@@ -62,7 +62,7 @@
 
           {% if section.settings.show_copyright %}
             <div class="footer__copyright">
-              &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+              &copy; {{ 'now' | date: '%Y' }} PEAK FRAMEWORK. All rights reserved.
 
               {% if section.settings.show_powered_by %}
                 <br>
@@ -88,9 +88,10 @@
               {% for link in section.settings.menu.links %}
                 <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
               {% endfor %}
-            {% elsif is_design_mode %}
-              <a href="#" class="footer__link">Home</a>
-              <a href="#" class="footer__link">Catalog</a>
+            {% else %}
+              <a href="{{ routes.root_url }}" class="footer__link">Home</a>
+              <a href="{{ routes.all_products_collection_url }}" class="footer__link">Catalog</a>
+              <a href="#" class="footer__link">About Us</a>
               <a href="#" class="footer__link">Contact</a>
             {% endif %}
           </nav>
@@ -149,8 +150,18 @@
 }
 
 #section-{{ sid }} .footer__brand-title {
+  font-family: var(--font-family-heading, var(--font-primary--family));
   font-size: var(--font-size-xl, 24px);
-  font-weight: var(--font-weight-bold, 700);
+  font-weight: var(--font-weight-bold, 800);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+#section-{{ sid }} .footer__brand-title .logo-accent {
+  color: var(--color-accent, #E41616);
 }
 
 #section-{{ sid }} .footer__description {
@@ -398,7 +409,7 @@
       "step": 5,
       "unit": "px",
       "label": "Margin top",
-      "default": 80
+      "default": 30
     },
     {
       "type": "range",
@@ -408,7 +419,7 @@
       "step": 5,
       "unit": "px",
       "label": "Padding top",
-      "default": 80
+      "default": 60
     },
     {
       "type": "range",
@@ -418,7 +429,7 @@
       "step": 5,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 50
+      "default": 40
     }
   ],
   "presets": [
@@ -439,9 +450,9 @@
         "color_mode": "theme",
         "bg_color": "#121212",
         "text_color": "#EAEAEA",
-        "margin_top": 80,
-        "padding_top": 80,
-        "padding_bottom": 50
+        "margin_top": 30,
+        "padding_top": 60,
+        "padding_bottom": 40
       }
     }
   ]

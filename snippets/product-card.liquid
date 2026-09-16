@@ -24,6 +24,9 @@
   assign t_add_to_wishlist = 'products.product.add_to_wishlist' | t | default: 'Add to wishlist'
   assign t_title_fallback  = 'products.product.product_fallback' | t | default: 'Example Product'
   assign t_sold_out        = 'products.product.sold_out' | t | default: 'Sold out'
+
+  assign default_alt = card_product.title | default: t_title_fallback
+  assign card_alt = card_product.featured_image.alt | default: default_alt | escape
 -%}
 
 <div class="product-card js-product-item" data-product-card>
@@ -42,7 +45,7 @@
             sizes: '(max-width: 767px) 300px, 600px',
             wrapper_class: 'img-cover',
             loading: 'lazy',
-            alt: card_product.featured_image.alt | default: card_product.title | escape
+            alt: card_alt
           %}
         {% else %}
           <div class="placeholder-wrapper">
@@ -55,7 +58,7 @@
         <span class="badge badge--sale">
           -{{ current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price }}%
         </span>
-      {% elsif current_variant.available == false %}
+      {% elsif current_variant.available == false and card_product != blank %}
         <span class="badge badge--sold-out">
           {{ t_sold_out }}
         </span>
@@ -66,10 +69,10 @@
           type="button" 
           class="icon-btn js-wishlist-btn"
           data-action="wishlist-toggle"
-          data-id="{{ current_variant.id }}"
-          data-handle="{{ card_product.handle }}"
+          data-id="{{ current_variant.id | default: 123456 }}"
+          data-handle="{{ card_product.handle | default: 'example-product' }}"
           aria-label="{{ t_add_to_wishlist }}"
-          data-title="{{ card_product.title | escape }}"
+          data-title="{{ card_product.title | default: t_title_fallback | escape }}"
         >
           <span class="icon-heart" aria-hidden="true">♥</span>
         </button>
@@ -78,10 +81,10 @@
           type="button" 
           class="icon-btn js-atc-btn" 
           data-action="cart-add"
-          data-variant-id="{{ current_variant.id }}"
-          data-title="{{ card_product.title | escape }}"
+          data-variant-id="{{ current_variant.id | default: 123456 }}"
+          data-title="{{ card_product.title | default: t_title_fallback | escape }}"
           aria-label="{{ t_add_to_cart }}"
-          {% unless current_variant.available %}disabled{% endunless %}
+          {% if card_product != blank and current_variant.available == false %}disabled{% endif %}
         >
           <span class="icon-cart" aria-hidden="true">🛒</span>
         </button>
