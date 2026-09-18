@@ -36,9 +36,15 @@
           loading: 'eager',
           alt: shop.name
         %}
-      {% else %}
-        <span class="header__logo-text">
-        PEAK<span class="logo-accent">.</span>
+      {% endif %}
+
+      {% if section.settings.logo_text != blank %}
+        <span class="header__logo-text header__logo-text--custom">
+          {{ section.settings.logo_text | escape }}
+        </span>
+      {% elsif section.settings.logo == blank %}
+        <span class="header__logo-text header__logo-text--default">
+          PEAK<span class="logo-accent">.</span>
         </span>
       {% endif %}
     </a>
@@ -174,11 +180,13 @@
 </header>
 
 {% style %}
-/* ================================
-   HEADER STYLES
-================================ */
+
 #shopify-section-{{ section.id }} {
   --header-icon-size: {{ section.settings.icon_size | default: 24 }}px;
+  --logo-text-font-size: {{ section.settings.logo_text_size | default: 22 }}px;
+  --logo-text-weight: {{ section.settings.logo_text_weight | default: '800' }};
+  --logo-text-transform: {{ section.settings.logo_text_transform | default: 'uppercase' }};
+  --logo-text-spacing: {{ section.settings.logo_text_spacing | default: 1 }}px;
 }
 
 .site-header {
@@ -198,21 +206,41 @@
 
 .header__burger-btn { grid-area: burger-zone; justify-self: start; display: none; }
 .header__title { grid-area: logo-zone; justify-self: start; display: flex; max-width: 100%; min-width: 0; }
+
+.header__logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs, 8px);
+  text-decoration: none;
+}
+
 .header__logo-text {
   font-family: var(--font-family-heading, var(--font-primary--family));
-  font-size: var(--font-size-xl, 22px);
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
   color: var(--color-foreground);
   display: inline-flex;
   align-items: center;
   line-height: 1;
 }
 
-.header__logo-text .logo-accent {
-  color: var(--color-accent);
+.header__logo-text--default {
+  font-size: var(--font-size-xl, 22px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
+
+.header__logo-text--default .logo-accent {
+  color: var(--color-accent, #E41616);
+  margin-left: -0.05em;
+}
+
+.header__logo-text--custom {
+  font-size: var(--logo-text-font-size);
+  font-weight: var(--logo-text-weight);
+  letter-spacing: var(--logo-text-spacing);
+  text-transform: var(--logo-text-transform);
+}
+
 .header__menu {
   grid-area: menu-zone;
   display: flex;
@@ -223,8 +251,9 @@
   flex: 1 1 auto;
   min-width: 0; 
 }
+
 .header__right { grid-area: right-zone; justify-self: end; display: flex; align-items: center; gap: var(--space-sm); flex-wrap: nowrap; }
-.header__logo { max-width: 100%; height: auto; }
+.header__logo { max-width: 100%; height: auto; display: block; }
 
 .site-header a {
   position: relative;
@@ -751,24 +780,66 @@ document.addEventListener('DOMContentLoaded', () => {
   "class": "section-header",
   "settings": [
     {
+      "type": "header",
+      "content": "Logo & Brand"
+    },
+    {
       "type": "image_picker",
       "id": "logo",
-      "label": "Logo"
+      "label": "Logo Image"
     },
     {
-      "type": "image_picker",
-      "id": "icon_cart",
-      "label": "Cart icon"
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "info": "Optional text placed alongside logo image, or used as main logo if image is empty."
     },
     {
-      "type": "image_picker",
-      "id": "icon_wishlist",
-      "label": "Wishlist icon"
+      "type": "range",
+      "id": "logo_text_size",
+      "label": "Text Size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 22
     },
     {
-      "type": "image_picker",
-      "id": "icon_account",
-      "label": "Account icon"
+      "type": "select",
+      "id": "logo_text_weight",
+      "label": "Font Weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "600", "label": "Semi-Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "800"
+    },
+    {
+      "type": "select",
+      "id": "logo_text_transform",
+      "label": "Letter Case",
+      "options": [
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "capitalize", "label": "Capitalize" },
+        { "value": "none", "label": "Normal" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "logo_text_spacing",
+      "label": "Letter Spacing (Custom text)",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
     },
     {
       "type": "link_list",
@@ -788,7 +859,22 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       "type": "header",
-      "content": "Appearance"
+      "content": "Icons & Appearance"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_cart",
+      "label": "Cart icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_wishlist",
+      "label": "Wishlist icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_account",
+      "label": "Account icon"
     },
     {
       "type": "range",
@@ -824,6 +910,11 @@ document.addEventListener('DOMContentLoaded', () => {
       "name": "Header",
       "settings": {
         "header_layout": "left-logo",
+        "logo_text": "",
+        "logo_text_size": 22,
+        "logo_text_weight": "800",
+        "logo_text_transform": "uppercase",
+        "logo_text_spacing": 1,
         "icon_size": 24,
         "sticky_header": true,
         "show_wishlist": true,
