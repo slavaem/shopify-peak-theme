@@ -7,6 +7,7 @@
   endif
 
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+  assign card_bg_opacity = section.settings.card_bg_opacity | divided_by: 100.0
 -%}
 
 <section 
@@ -28,8 +29,107 @@
     </div>
   {% endif %}
 
-  <div class="custom-section__content page-width">
-    {% content_for 'blocks' %}
+  <div class="custom-section__container page-width">
+    <div class="custom-section__card">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'heading' %}
+            <h2 class="custom-section__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+              {{ block.settings.heading | escape }}
+            </h2>
+
+          {% when 'richtext' %}
+            <div class="custom-section__text rte" {{ block.shopify_attributes }}>
+              {{ block.settings.text }}
+            </div>
+
+          {% when 'plain_text' %}
+            {% if block.settings.text != blank %}
+              <div class="custom-section__plain-text" {{ block.shopify_attributes }}>
+                {{ block.settings.text | newline_to_br }}
+              </div>
+            {% endif %}
+
+          {% when 'image' %}
+            {% if block.settings.image != blank %}
+              <div 
+                class="custom-section__image-wrapper" 
+                style="
+                  --img-max-width: {{ block.settings.image_width }}%; 
+                  --img-aspect: {{ block.settings.aspect_ratio }}; 
+                  --img-fit: {{ block.settings.object_fit }}; 
+                  --img-radius: {{ block.settings.corner_radius }}px; 
+                  justify-content: {{ block.settings.alignment }};
+                " 
+                {{ block.shopify_attributes }}
+              >
+                {% if block.settings.link != blank %}
+                  <a href="{{ block.settings.link }}" class="custom-section__image-link">
+                {% endif %}
+                
+                {% render 'image',
+                  image: block.settings.image,
+                  class: 'custom-section__image',
+                  widths: '375, 550, 750, 1100, 1500, 2000',
+                  loading: block.settings.loading,
+                  sizes: '(max-width: 767px) 100vw, 1200px'
+                %}
+
+                {% if block.settings.link != blank %}
+                  </a>
+                {% endif %}
+              </div>
+            {% else %}
+              <div 
+                class="custom-section__image-placeholder" 
+                style="--img-max-width: {{ block.settings.image_width }}%; --img-radius: {{ block.settings.corner_radius }}px;" 
+                {{ block.shopify_attributes }}
+              >
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            {% endif %}
+
+          {% when 'button' %}
+            {% if block.settings.button_label != blank %}
+              <div class="custom-section__button-wrapper" {{ block.shopify_attributes }}>
+                <a 
+                  href="{{ block.settings.button_link | default: '#' }}" 
+                  class="btn {% if block.settings.button_style_secondary %}btn--secondary{% else %}btn--primary{% endif %}"
+                >
+                  {{ block.settings.button_label | escape }}
+                </a>
+              </div>
+            {% endif %}
+
+          {% when 'flex_group' %}
+            <div 
+              class="custom-section__content-group custom-section__content-group--{{ block.settings.direction }}" 
+              style="--flex-gap: {{ block.settings.gap }}px; --flex-align: {{ block.settings.align_items }};"
+              {{ block.shopify_attributes }}
+            >
+              {% if block.settings.title != blank %}
+                <h3 class="custom-section__group-title">{{ block.settings.title | escape }}</h3>
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <div class="custom-section__group-text rte">{{ block.settings.text }}</div>
+              {% endif %}
+            </div>
+
+          {% when 'custom_liquid' %}
+            <div class="custom-section__liquid" {{ block.shopify_attributes }}>
+              {{ block.settings.custom_liquid }}
+            </div>
+
+          {% when 'spacer' %}
+            <div 
+              class="custom-section__spacer" 
+              style="height: {{ block.settings.space_height }}px;" 
+              {{ block.shopify_attributes }}
+            ></div>
+
+        {% endcase %}
+      {% endfor %}
+    </div>
   </div>
 </section>
 
@@ -37,13 +137,18 @@
 #custom-section-{{ sid }} {
   --section-bg: {{ bg_value }};
   --overlay-bg: rgba(0, 0, 0, {{ overlay_opacity }});
+  --card-bg: rgba({{ section.settings.card_bg_color.red }}, {{ section.settings.card_bg_color.green }}, {{ section.settings.card_bg_color.blue }}, {{ card_bg_opacity }});
+  --card-text-color: {{ section.settings.text_color }};
   
   position: relative;
   overflow: hidden;
   width: 100%;
+  min-height: {{ section.settings.min_height }}px;
   background: var(--section-bg);
   padding-top: {{ section.settings.padding_top }}px;
   padding-bottom: {{ section.settings.padding_bottom }}px;
+  display: flex;
+  align-items: {{ section.settings.desktop_content_position }};
 }
 
 #custom-section-{{ sid }} .custom-section__background {
@@ -71,14 +176,104 @@
   z-index: 1;
 }
 
-#custom-section-{{ sid }} .custom-section__content {
+#custom-section-{{ sid }} .custom-section__container {
   position: relative;
   z-index: 2;
-  margin-inline: auto;
+  width: 100%;
+  display: flex;
+  justify-content: {{ section.settings.desktop_content_alignment }};
 }
 
-#custom-section-{{ sid }} .custom-section__content > * + * {
-  margin-top: var(--space-md, 20px);
+#custom-section-{{ sid }} .custom-section__card {
+  width: 100%;
+  max-width: {{ section.settings.content_max_width }}px;
+  background: var(--card-bg);
+  color: var(--card-text-color);
+  padding: {{ section.settings.card_padding }}px;
+  border-radius: {{ section.settings.card_corner_radius }}px;
+  text-align: {{ section.settings.text_alignment }};
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 16px);
+  {% if card_bg_opacity > 0 and section.settings.enable_blur %}
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  {% endif %}
+}
+
+#custom-section-{{ sid }} .custom-section__heading {
+  color: inherit;
+  margin: 0;
+  line-height: 1.2;
+}
+
+#custom-section-{{ sid }} .custom-section__heading.h1 { font-size: clamp(28px, 4vw, 48px); }
+#custom-section-{{ sid }} .custom-section__heading.h2 { font-size: clamp(22px, 3vw, 36px); }
+#custom-section-{{ sid }} .custom-section__heading.h3 { font-size: clamp(18px, 2vw, 24px); }
+
+#custom-section-{{ sid }} .custom-section__text,
+#custom-section-{{ sid }} .custom-section__plain-text {
+  color: inherit;
+}
+
+#custom-section-{{ sid }} .custom-section__plain-text {
+  white-space: pre-line;
+  line-height: var(--line-height-base, 1.5);
+}
+
+/* IMAGE BLOCK STYLES */
+#custom-section-{{ sid }} .custom-section__image-wrapper,
+#custom-section-{{ sid }} .custom-section__image-placeholder {
+  display: flex;
+  width: 100%;
+}
+
+#custom-section-{{ sid }} .custom-section__image-link {
+  display: inline-block;
+  width: var(--img-max-width, 100%);
+}
+
+#custom-section-{{ sid }} .custom-section__image-wrapper img,
+#custom-section-{{ sid }} .custom-section__image-placeholder svg {
+  width: var(--img-max-width, 100%);
+  height: auto;
+  aspect-ratio: var(--img-aspect, auto);
+  object-fit: var(--img-fit, cover);
+  border-radius: var(--img-radius, 0px);
+  display: block;
+}
+
+/* CONTENT GROUP BLOCK STYLES */
+#custom-section-{{ sid }} .custom-section__content-group {
+  display: flex;
+  gap: var(--flex-gap, 16px);
+  align-items: var(--flex-align, center);
+  width: 100%;
+}
+
+#custom-section-{{ sid }} .custom-section__content-group--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#custom-section-{{ sid }} .custom-section__content-group--column {
+  flex-direction: column;
+}
+
+#custom-section-{{ sid }} .custom-section__button-wrapper {
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  #custom-section-{{ sid }} {
+    min-height: auto;
+  }
+  #custom-section-{{ sid }} .custom-section__card {
+    padding: calc({{ section.settings.card_padding }}px * 0.65);
+  }
+  #custom-section-{{ sid }} .custom-section__content-group--row {
+    flex-direction: column;
+  }
 }
 {% endstyle %}
 
@@ -87,14 +282,25 @@
   "name": "Custom Section",
   "tag": "section",
   "class": "section-custom-wrapper",
-  "blocks": [
-    { "type": "@theme" }
-  ],
   "settings": [
+    {
+      "type": "header",
+      "content": "Background & Height"
+    },
     {
       "type": "image_picker",
       "id": "background_image",
       "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Minimum section height",
+      "default": 400
     },
     {
       "type": "range",
@@ -103,17 +309,13 @@
       "max": 90,
       "step": 5,
       "unit": "%",
-      "label": "Overlay Opacity",
-      "default": 0
-    },
-    {
-      "type": "header",
-      "content": "Section Background"
+      "label": "Image Overlay Opacity",
+      "default": 20
     },
     {
       "type": "select",
       "id": "color_mode",
-      "label": "Background source",
+      "label": "Section Background Source",
       "options": [
         { "value": "theme", "label": "Theme default" },
         { "value": "custom", "label": "Custom" }
@@ -123,12 +325,111 @@
     {
       "type": "color",
       "id": "bg_color",
-      "label": "Custom background",
-      "default": "#FFFFFF"
+      "label": "Custom section background",
+      "default": "#F4F4F4"
     },
     {
       "type": "header",
-      "content": "Padding"
+      "content": "Content Box Position & Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_content_alignment",
+      "label": "Horizontal Position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "label": "Vertical Position",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment inside Box",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Box Max Width",
+      "default": 680
+    },
+    {
+      "type": "header",
+      "content": "Content Card Style"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "card_bg_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Card Background Opacity",
+      "default": 85
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_blur",
+      "label": "Enable Glassmorphic Blur",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Card Inner Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "card_corner_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
     },
     {
       "type": "range",
@@ -138,7 +439,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 48
+      "default": 60
     },
     {
       "type": "range",
@@ -148,19 +449,273 @@
       "step": 4,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 48
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Custom Section Title"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "options": [
+            { "value": "h3", "label": "Small" },
+            { "value": "h2", "label": "Medium" },
+            { "value": "h1", "label": "Large" }
+          ],
+          "default": "h1"
+        }
+      ]
+    },
+    {
+      "type": "richtext",
+      "name": "Rich Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Content Text",
+          "default": "<p>Combine background images, custom images, rich text, and flexible layout blocks.</p>"
+        }
+      ]
+    },
+    {
+      "type": "plain_text",
+      "name": "Plain Text (Textarea)",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Plain Text",
+          "default": "Line 1\nLine 2\nLine 3"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Image Width",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Aspect Ratio",
+          "options": [
+            { "value": "auto", "label": "Adapt to image" },
+            { "value": "1 / 1", "label": "Square (1:1)" },
+            { "value": "16 / 9", "label": "Widescreen (16:9)" },
+            { "value": "4 / 3", "label": "Standard (4:3)" },
+            { "value": "3 / 2", "label": "Classic (3:2)" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "select",
+          "id": "object_fit",
+          "label": "Object Fit",
+          "options": [
+            { "value": "cover", "label": "Cover" },
+            { "value": "contain", "label": "Contain" }
+          ],
+          "default": "cover"
+        },
+        {
+          "type": "range",
+          "id": "corner_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Image Border Radius",
+          "default": 8
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Image Alignment",
+          "options": [
+            { "value": "flex-start", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "flex-end", "label": "Right" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "loading",
+          "label": "Loading priority",
+          "options": [
+            { "value": "lazy", "label": "Lazy (Standard)" },
+            { "value": "eager", "label": "Eager (High Priority)" }
+          ],
+          "default": "lazy"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Image Link"
+        }
+      ]
+    },
+    {
+      "type": "flex_group",
+      "name": "Content Group",
+      "settings": [
+        {
+          "type": "select",
+          "id": "direction",
+          "label": "Layout Direction",
+          "options": [
+            { "value": "row", "label": "Horizontal (Row)" },
+            { "value": "column", "label": "Vertical (Column)" }
+          ],
+          "default": "row"
+        },
+        {
+          "type": "range",
+          "id": "gap",
+          "min": 0,
+          "max": 48,
+          "step": 4,
+          "unit": "px",
+          "label": "Gap between title & text",
+          "default": 16
+        },
+        {
+          "type": "select",
+          "id": "align_items",
+          "label": "Align Items",
+          "options": [
+            { "value": "flex-start", "label": "Top / Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "flex-end", "label": "Bottom / Right" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Group Heading",
+          "default": "Group Title"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Group Text",
+          "default": "<p>Add aligned description text alongside the title.</p>"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "label": "Use secondary button style",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom Liquid / Code",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Custom Liquid / HTML code",
+          "info": "Add custom HTML, inline CSS, or Liquid code snippet here."
+        }
+      ]
+    },
+    {
+      "type": "spacer",
+      "name": "Spacer",
+      "settings": [
+        {
+          "type": "range",
+          "id": "space_height",
+          "min": 8,
+          "max": 64,
+          "step": 4,
+          "unit": "px",
+          "label": "Space height",
+          "default": 24
+        }
+      ]
     }
   ],
   "presets": [
     {
       "name": "Custom Section",
       "settings": {
-        "overlay_opacity": 0,
-        "color_mode": "theme",
-        "bg_color": "#FFFFFF",
-        "padding_top": 48,
-        "padding_bottom": 48
-      }
+        "min_height": 480,
+        "desktop_content_alignment": "center",
+        "desktop_content_position": "center",
+        "text_alignment": "center",
+        "content_max_width": 680,
+        "card_bg_color": "#FFFFFF",
+        "card_bg_opacity": 85,
+        "enable_blur": true,
+        "card_padding": 40,
+        "card_corner_radius": 12
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "heading": "DESIGNED TO BE FLEXIBLE."
+          }
+        },
+        {
+          "type": "richtext",
+          "settings": {
+            "text": "<p>Position your message anywhere on screen, add inline images, and align content with custom Content Groups.</p>"
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "button_label": "EXPLORE COLLECTION"
+          }
+        }
+      ]
     }
   ]
 }
