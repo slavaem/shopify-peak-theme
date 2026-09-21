@@ -15,13 +15,13 @@
       <header class="about__hero">
         {% if aboutbrand_title != blank %}
           <h1 class="about__title">
-            {{ aboutbrand_title }}
+            {{ aboutbrand_title | escape }}
           </h1>
         {% endif %}
 
         {% if aboutbrand_subtitle != blank %}
           <p class="about__subtitle">
-            {{ aboutbrand_subtitle }}
+            {{ aboutbrand_subtitle | escape }}
           </p>
         {% endif %}
       </header>
@@ -29,7 +29,7 @@
 
     <!-- DESCRIPTION -->
     {% if section.settings.description != blank %}
-      <div class="about__description">
+      <div class="about__description rte">
         {{ section.settings.description }}
       </div>
     {% endif %}
@@ -57,7 +57,11 @@
                 alt: img_alt
               %}
             {% else %}
-              {{ 'lifestyle-' | append: i | placeholder_svg_tag: 'about__placeholder' }}
+              {% assign placeholder_num = i %}
+              {% if placeholder_num > 2 %}
+                {% assign placeholder_num = 1 %}
+              {% endif %}
+              {{ 'lifestyle-' | append: placeholder_num | placeholder_svg_tag: 'about__placeholder' }}
             {% endif %}
           </figure>
         {% endfor %}
@@ -72,12 +76,12 @@
             <article class="about__feature" {{ block.shopify_attributes }}>
               {% if block.settings.title != blank %}
                 <h3 class="about__feature-title">
-                  {{ block.settings.title }}
+                  {{ block.settings.title | escape }}
                 </h3>
               {% endif %}
               {% if block.settings.text != blank %}
                 <p class="about__feature-text">
-                  {{ block.settings.text }}
+                  {{ block.settings.text | escape }}
                 </p>
               {% endif %}
             </article>
@@ -91,12 +95,12 @@
       <section class="about__list">
         {% if section.settings.list_title != blank %}
           <h2 class="about__list-title">
-            {{ section.settings.list_title }}
+            {{ section.settings.list_title | escape }}
           </h2>
         {% endif %}
 
         {% if section.settings.list_content != blank %}
-          <div class="about__list-content">
+          <div class="about__list-content rte">
             {{ section.settings.list_content }}
           </div>
         {% endif %}
@@ -118,7 +122,7 @@
     --about-flex-align: center;
   {% endif %}
 
-  padding: var(--space-2xl) var(--page-margin);
+  padding: var(--space-2xl, 64px) var(--page-margin, 5%);
 }
 
 #about-{{ sid }} .about__inner {
@@ -129,28 +133,28 @@
 /* HERO */
 #about-{{ sid }} .about__hero {
   text-align: var(--about-text-align);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-xl, 32px);
   display: flex;
   flex-direction: column;
   align-items: var(--about-flex-align);
 }
 
 #about-{{ sid }} .about__title {
-  font-size: var(--hero-title);
-  margin-bottom: var(--space-sm);
-  color: var(--color-text-primary);
+  font-size: var(--hero-title, clamp(28px, 4vw, 42px));
+  margin-bottom: var(--space-sm, 16px);
+  color: var(--color-text-primary, currentColor);
 }
 
 #about-{{ sid }} .about__subtitle {
-  font-size: var(--subtitle);
-  color: var(--color-text-secondary);
+  font-size: var(--subtitle, 18px);
+  color: var(--color-text-secondary, #666666);
 }
 
 /* DESCRIPTION */
 #about-{{ sid }} .about__description {
   line-height: 1.7;
-  margin-bottom: var(--space-xl);
-  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl, 32px);
+  color: var(--color-text-secondary, #666666);
   text-align: var(--about-text-align);
 }
 
@@ -158,15 +162,16 @@
 #about-{{ sid }} .about__media {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  gap: var(--space-md, 24px);
+  margin-bottom: var(--space-xl, 32px);
 }
 
 #about-{{ sid }} .about__media-item {
+  margin: 0;
   overflow: hidden;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  background: var(--color-surface-subtle);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+  background: var(--color-surface-subtle, #f4f4f4);
   aspect-ratio: 4 / 3;
 }
 
@@ -179,7 +184,7 @@
 }
 
 #about-{{ sid }} .about__media-item img {
-  transition: transform var(--transition-base);
+  transition: transform var(--transition-base, 0.3s ease);
 }
 
 #about-{{ sid }} .about__media-item:hover img {
@@ -190,50 +195,51 @@
 #about-{{ sid }} .about__features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  gap: var(--space-md, 24px);
+  margin-bottom: var(--space-xl, 32px);
 }
 
 #about-{{ sid }} .about__feature {
-  padding: var(--space-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  padding: var(--space-lg, 24px);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface, #ffffff);
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+  transition: transform var(--transition-base, 0.3s ease), box-shadow var(--transition-base, 0.3s ease);
   will-change: transform;
 }
 
 #about-{{ sid }} .about__feature-title {
-  font-size: var(--heading-sm);
-  margin-bottom: var(--space-xs);
-  color: var(--color-text-primary);
+  font-size: var(--heading-sm, 18px);
+  margin-bottom: var(--space-xs, 8px);
+  color: var(--color-text-primary, #000000);
 }
 
 #about-{{ sid }} .about__feature-text {
-  color: var(--color-text-secondary);
-  font-size: var(--text-small);
+  color: var(--color-text-secondary, #666666);
+  font-size: var(--text-small, 14px);
+  margin: 0;
 }
 
 #about-{{ sid }} .about__feature:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
 }
 
 /* LIST CONTENT */
 #about-{{ sid }} .about__list {
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-lg, 24px);
+  border-top: 1px solid var(--color-border, #e2e8f0);
 }
 
 #about-{{ sid }} .about__list-title {
-  font-size: var(--heading-md);
-  margin-bottom: var(--space-sm);
-  color: var(--color-text-primary);
+  font-size: var(--heading-md, 24px);
+  margin-bottom: var(--space-sm, 16px);
+  color: var(--color-text-primary, #000000);
 }
 
 #about-{{ sid }} .about__list-content {
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #666666);
 }
 {% endstyle %}
 
@@ -243,6 +249,10 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "💡 Click the section header in the left sidebar to configure container width, text alignment, image grid, and titles."
+    },
     {
       "type": "header",
       "content": "Layout"

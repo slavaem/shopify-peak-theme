@@ -1,0 +1,86 @@
+{
+  "name": "Landing Constructor",
+  "sections": {
+    "hero_banner": {
+      "type": "custom-section",
+      "blocks": {
+        "heading_1": {
+          "type": "heading",
+          "settings": {
+            "heading": "SPECIAL PROMO OFFER",
+            "heading_size": "h1"
+          }
+        },
+        "text_1": {
+          "type": "richtext",
+          "settings": {
+            "text": "<p>Discover our exclusive products engineered for maximum performance and modern lifestyle.</p>"
+          }
+        },
+        "button_1": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "/collections/all",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": ["heading_1", "text_1", "button_1"],
+      "settings": {
+        "min_height": 520,
+        "overlay_opacity": 25,
+        "color_mode": "theme",
+        "desktop_content_alignment": "center",
+        "desktop_content_position": "center",
+        "text_alignment": "center",
+        "content_max_width": 680,
+        "card_bg_color": "#ffffff",
+        "card_bg_opacity": 90,
+        "enable_blur": true,
+        "card_padding": 40,
+        "card_corner_radius": 12,
+        "padding_top": 0,
+        "padding_bottom": 40
+      }
+    },
+    "brand_story": {
+      "type": "about-brand",
+      "blocks": {
+        "card_1": {
+          "type": "feature_card",
+          "settings": {
+            "title": "Premium Quality",
+            "text": "Crafted with dynamic layout architecture and high durability standard."
+          }
+        },
+        "card_2": {
+          "type": "feature_card",
+          "settings": {
+            "title": "Fast Shipping",
+            "text": "Worldwide delivery with real-time order tracking support."
+          }
+        },
+        "card_3": {
+          "type": "feature_card",
+          "settings": {
+            "title": "24/7 Support",
+            "text": "Our dedicated team is always here to assist with your custom needs."
+          }
+        }
+      },
+      "block_order": ["card_1", "card_2", "card_3"],
+      "settings": {
+        "content_width": 1200,
+        "text_alignment": "center",
+        "title": "Why Choose Peak",
+        "subtitle": "Modular Shopify architecture built for seamless user experience.",
+        "description": "<p>Build high-converting storefronts using our flexible section ecosystem.</p>",
+        "show_images": true,
+        "list_title": "Key Features",
+        "list_content": "<ul><li>High performance core</li><li>Full customizer controls</li></ul>"
+      }
+    }
+  },
+  "order": ["hero_banner", "brand_story"]
+}
