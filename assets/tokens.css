@@ -1,6 +1,6 @@
 :root {
   /* =========================
-     TYPOGRAPHY (Глобальное назначение ролей шрифтов)
+     TYPOGRAPHY 
   ========================= */
   --font-family-body: var(--font-primary--family);
   --font-family-heading: var(--font-secondary--family);

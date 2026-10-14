@@ -24,7 +24,7 @@
   endif
 -%}
 
-<footer id="section-{{ sid }}" class="site-footer" data-component="footer">
+<footer id="section-{{ sid }}" class="site-footer {% if section.settings.bg_image != blank %}has-bg-image{% endif %}" data-component="footer">
   <div class="page-width">
     <div class="footer__grid">
       
@@ -131,8 +131,16 @@
   --payment-icon-width: 38px;
   --payment-icon-height: 24px;
 
-  background: var(--section-bg);
+  background-color: var(--section-bg);
   color: var(--section-text);
+
+  {% if section.settings.bg_image != blank %}
+    background-image: url('{{ section.settings.bg_image | image_url: width: 2000 }}');
+    background-size: {{ section.settings.bg_size | default: 'cover' }};
+    background-position: {{ section.settings.bg_position | default: 'center center' }};
+    background-repeat: no-repeat;
+  {% endif %}
+
   padding-top: {{ section.settings.padding_top }}px;
   padding-bottom: {{ section.settings.padding_bottom }}px;
   margin-top: {{ section.settings.margin_top }}px;
@@ -377,7 +385,7 @@
     },
     {
       "type": "header",
-      "content": "Colors & Spacing"
+      "content": "Colors & Background"
     },
     {
       "type": "select",
@@ -400,6 +408,36 @@
       "id": "text_color",
       "label": "Footer text color",
       "default": "#EAEAEA"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Footer background image"
+    },
+    {
+      "type": "select",
+      "id": "bg_position",
+      "label": "Image focal point (position)",
+      "options": [
+        { "value": "top center", "label": "Top" },
+        { "value": "center center", "label": "Center" },
+        { "value": "bottom center", "label": "Bottom" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "select",
+      "id": "bg_size",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover", "label": "Fill footer (Cover)" },
+        { "value": "contain", "label": "Fit inside (Contain)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
     },
     {
       "type": "range",
@@ -450,6 +488,8 @@
         "color_mode": "theme",
         "bg_color": "#121212",
         "text_color": "#EAEAEA",
+        "bg_position": "center center",
+        "bg_size": "cover",
         "margin_top": 30,
         "padding_top": 60,
         "padding_bottom": 40

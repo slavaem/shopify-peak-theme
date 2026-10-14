@@ -2,11 +2,27 @@
 
 {%- liquid
   assign is_design_mode = request.design_mode
+
+  assign bg_value = 'var(--color-background)'
+  assign text_value = 'var(--color-foreground)'
+
+  if section.settings.color_mode == 'custom'
+    assign bg_value = section.settings.bg_color
+    assign text_value = section.settings.text_color
+  endif
+
+  assign logo_font = section.settings.logo_font
 -%}
+
+{%- if logo_font != blank -%}
+  {%- style -%}
+    {{ logo_font | font_face: font_display: 'swap' }}
+  {%- endstyle -%}
+{%- endif -%}
 
 <header 
   id="shopify-section-{{ sid }}-header"
-  class="site-header site-header--{{ section.settings.header_layout }} {% if section.settings.sticky_header %}is-sticky{% endif %}"
+  class="site-header site-header--{{ section.settings.header_layout }} {% if section.settings.sticky_header %}is-sticky{% endif %} {% if section.settings.bg_image != blank %}has-bg-image{% endif %}"
   data-component="header"
 >
 
@@ -29,10 +45,10 @@
       {% if section.settings.logo != blank %}
         {% render 'image',
           image: section.settings.logo,
-          width: 200,
+          width: section.settings.logo_width,
           class: 'header__logo',
-          widths: '100,150,200,300',
-          sizes: '(max-width: 768px) 150px, 200px',
+          widths: '100,120,140,160,180,200,240,300,360,480',
+          sizes: '(max-width: 768px) min(140px, {{ section.settings.logo_width }}px), {{ section.settings.logo_width }}px',
           loading: 'eager',
           alt: shop.name
         %}
@@ -180,13 +196,17 @@
 </header>
 
 {% style %}
-
 #shopify-section-{{ section.id }} {
+  --logo-width: {{ section.settings.logo_width | default: 180 }}px;
   --header-icon-size: {{ section.settings.icon_size | default: 24 }}px;
   --logo-text-font-size: {{ section.settings.logo_text_size | default: 22 }}px;
-  --logo-text-weight: {{ section.settings.logo_text_weight | default: '800' }};
+  --logo-text-weight: {{ logo_font.weight | default: section.settings.logo_text_weight | default: '800' }};
+  --logo-text-style: {{ logo_font.style | default: 'normal' }};
   --logo-text-transform: {{ section.settings.logo_text_transform | default: 'uppercase' }};
   --logo-text-spacing: {{ section.settings.logo_text_spacing | default: 1 }}px;
+  
+  --header-bg: {{ bg_value }};
+  --header-text: {{ text_value }};
 }
 
 .site-header {
@@ -198,13 +218,60 @@
   align-items: center;
   padding: calc(var(--space-sm) / 2) var(--page-padding, 5%);
   gap: var(--space-sm);
-  background: var(--color-background);
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  
+  {% if section.settings.bg_image != blank %}
+    background-image: url('{{ section.settings.bg_image | image_url: width: 2000 }}');
+    background-size: {{ section.settings.bg_size | default: 'cover' }};
+    background-position: {{ section.settings.bg_position | default: 'center center' }};
+    background-repeat: no-repeat;
+  {% endif %}
+
   border-bottom: 1px solid var(--color-border-light);
   position: relative;
   z-index: var(--z-header, 1000);
 }
 
-.header__burger-btn { grid-area: burger-zone; justify-self: start; display: none; }
+.site-header a,
+.header__logo-text,
+.header__link,
+.localization-btn {
+  color: var(--header-text);
+}
+
+.header__burger-btn {
+  grid-area: burger-zone;
+  justify-self: start;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2xs, 4px);
+  width: var(--control-size-md, 36px);
+  height: var(--control-size-md, 36px);
+  padding: var(--space-2xs, 4px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--header-text);
+  z-index: calc(var(--z-header, 100) + 1);
+  transition: opacity var(--transition-fast, 0.2s ease);
+}
+
+.header__burger-btn:hover {
+  opacity: 0.8;
+}
+
+.header__burger-btn span {
+  display: block;
+  width: var(--icon-size-lg, 24px);
+  height: 2px;
+  background-color: currentColor;
+  transition: transform var(--transition-fast, 0.2s ease), opacity var(--transition-fast, 0.2s ease);
+  border-radius: var(--radius-xs, 2px);
+}
+
 .header__title { grid-area: logo-zone; justify-self: start; display: flex; max-width: 100%; min-width: 0; }
 
 .header__logo-link {
@@ -214,9 +281,38 @@
   text-decoration: none;
 }
 
+#shopify-section-{{ section.id }} .header__title {
+  max-width: var(--logo-width);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+#shopify-section-{{ section.id }} .header__logo-link {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  width: 100%;
+}
+
+#shopify-section-{{ section.id }} .header__logo,
+#shopify-section-{{ section.id }} .header__logo.image,
+#shopify-section-{{ section.id }} .header__logo img,
+#shopify-section-{{ section.id }} .header__logo .image__img {
+  width: 100% !important;
+  max-width: var(--logo-width) !important;
+  height: auto !important;
+  object-fit: contain;
+  display: block;
+}
+
 .header__logo-text {
-  font-family: var(--font-family-heading, var(--font-primary--family));
-  color: var(--color-foreground);
+  {% if logo_font != blank %}
+    font-family: {{ logo_font.family }}, {{ logo_font.fallback_families }};
+    font-weight: var(--logo-text-weight);
+    font-style: var(--logo-text-style);
+  {% else %}
+    font-family: var(--font-family-heading, var(--font-primary--family));
+  {% endif %}
   display: inline-flex;
   align-items: center;
   line-height: 1;
@@ -253,12 +349,10 @@
 }
 
 .header__right { grid-area: right-zone; justify-self: end; display: flex; align-items: center; gap: var(--space-sm); flex-wrap: nowrap; }
-.header__logo { max-width: 100%; height: auto; display: block; }
 
 .site-header a {
   position: relative;
   text-decoration: none;
-  color: var(--color-foreground);
 }
 
 .header__link {
@@ -329,18 +423,12 @@
   min-width: 0;
 }
 
-.site-header--right-menu .header__icons {
-  order: 1;
-}
-
-.site-header--right-menu .header__localization {
-  order: 2;
-}
+.site-header--right-menu .header__icons { order: 1; }
+.site-header--right-menu .header__localization { order: 2; }
 
 /* ================================
    MENU MORE
 ================================ */
-
 .menu-more {
   overflow: visible;
   display: flex;
@@ -374,7 +462,8 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--color-background);
+  background: var(--header-bg);
+  color: var(--header-text);
   display: none;
   flex-direction: column;
   z-index: 9999;
@@ -383,6 +472,7 @@
   border-radius: var(--radius-md);
   box-shadow: var(--card-shadow);
   gap: var(--space-sm);
+  border: 1px solid var(--color-border-light);
 }
 
 .menu-more[open] .menu-more__dropdown {
@@ -451,7 +541,7 @@
   top: calc(var(--space-sm) * -0.5);
   right: calc(var(--space-sm) * -0.5);
   background: var(--color-danger, #e53e3e);
-  color: var(--color-background, #ffffff);
+  color: #ffffff;
   font-size: var(--text-small, 12px);
   padding: 2px calc(var(--space-sm) / 2);
   border-radius: 999px;
@@ -479,8 +569,8 @@
 }
 
 .localization-btn {
-  background: var(--color-surface);
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border-light);
   border-radius: 999px;
   font-size: var(--text-small);
   font-weight: 600;
@@ -490,20 +580,22 @@
 }
 
 .localization-btn:hover {
-  background: var(--color-surface-hover);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .localization-dropdown {
   position: absolute;
   top: calc(100% + var(--space-xs, 6px));
   left: 0;
-  background: var(--color-background);
+  background: var(--header-bg);
+  color: var(--header-text);
   border-radius: var(--radius-md);
   padding: calc(var(--space-sm) / 2) 0;
   min-width: calc(var(--space-md) * 3);
   box-shadow: var(--card-shadow);
   list-style: none;
   z-index: 100;
+  border: 1px solid var(--color-border-light);
 }
 
 .localization-dropdown li a {
@@ -511,6 +603,7 @@
   padding: calc(var(--space-sm) / 1.5) var(--space-md);
   font-size: var(--text-small);
   text-align: center;
+  color: var(--header-text);
   transition: var(--card-transition);
 }
 
@@ -523,87 +616,126 @@
   top: 0;
 }
 
-.site-header [data-state="updated"] {
-  animation: pulse 0.25s ease;
-}
-
-.site-header[data-scrolled="true"] {
-  box-shadow: var(--card-shadow);
-}
-
-/* MOBILE BURGER & MENU */
+/* ================================
+   MOBILE MENU DRAWER
+================================ */
 .mobile-menu {
   position: fixed;
-  inset: 0;
-  z-index: 999;
-  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: calc(var(--z-header, 100) + 100);
+  display: flex;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity var(--transition-base);
+  transition: visibility var(--transition-base, 0.3s ease);
+}
+
+.mobile-menu[hidden] {
+  display: flex !important;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .mobile-menu[data-state="open"] {
-  opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
 .mobile-menu__overlay {
   position: absolute;
-  inset: 0;
-  background: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-overlay, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--transition-base, 0.3s ease);
+}
+
+.mobile-menu[data-state="open"] .mobile-menu__overlay {
+  opacity: 1;
 }
 
 .mobile-menu__panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: min(280px, 80%);
+  position: relative;
+  width: min(85vw, 360px);
   height: 100%;
-  background: var(--color-background);
+  background-color: var(--color-background, #ffffff);
+  color: var(--color-foreground, #121212);
+  display: flex;
+  flex-direction: column;
   transform: translateX(-100%);
-  transition: transform var(--transition-base);
+  transition: transform var(--card-transition, 0.3s cubic-bezier(0.16, 1, 0.3, 1));
+  box-shadow: var(--shadow-lg);
+  z-index: 1;
 }
 
 .mobile-menu[data-state="open"] .mobile-menu__panel {
   transform: translateX(0);
 }
 
-.header__burger-btn {
-  display: none; 
-  width: 40px;
-  height: 40px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  flex-direction: column;
-  justify-content: center;
+.mobile-menu__header {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  z-index: 1010; 
+  justify-content: flex-end;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.08));
 }
 
-.header__burger-btn:hover span {
-  transform: scaleX(1.1);
+.mobile-menu__close {
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-2xl, 28px);
+  line-height: 1;
+  width: var(--control-size-sm, 32px);
+  height: var(--control-size-sm, 32px);
+  border-radius: 50%;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast, 0.2s ease);
 }
 
-.header__burger-btn span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--color-foreground);
-  transition: var(--card-transition);
+.mobile-menu__close:hover {
+  background-color: var(--color-surface-subtle, rgba(0, 0, 0, 0.05));
 }
 
-.header__burger-btn[data-state="open"] span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+.mobile-menu__nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--space-sm) 0;
 }
 
-.header__burger-btn[data-state="open"] span:nth-child(2) {
-  opacity: 0;
+.mobile-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.header__burger-btn[data-state="open"] span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+.mobile-menu__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md, 18px);
+  font-weight: var(--font-weight-medium, 500);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--transition-fast, 0.2s ease), color var(--transition-fast, 0.2s ease);
+}
+
+.mobile-menu__link:hover,
+.mobile-menu__link.is-active {
+  background-color: var(--color-surface-subtle, rgba(0, 0, 0, 0.04));
+  font-weight: var(--font-weight-bold, 700);
 }
 
 @media (max-width: 768px) {
@@ -611,14 +743,63 @@
     grid-template-rows: auto !important;
     grid-template-columns: auto 1fr auto !important;
     grid-template-areas: "burger-zone logo-zone right-zone" !important;
-    gap: var(--space-sm) !important;
+    gap: var(--space-xs) var(--space-sm) !important;
+  }
+
+  .site-header--center-logo {
+    grid-template-rows: auto auto !important;
+    grid-template-columns: auto 1fr auto !important;
+    grid-template-areas: 
+      "logo-zone logo-zone logo-zone"
+      "burger-zone . right-zone" !important;
+    row-gap: var(--space-xs, 8px) !important;
+    padding-top: var(--space-sm) !important;
+    padding-bottom: var(--space-xs) !important;
+  }
+
+  .site-header--center-logo .header__title {
+    grid-area: logo-zone !important;
+    justify-self: center !important;
+    margin-bottom: var(--space-2xs, 4px);
+  }
+
+  .site-header--center-logo .header__burger-btn {
+    grid-area: burger-zone !important;
+    justify-self: start !important;
+  }
+
+  .site-header--center-logo .header__right {
+    grid-area: right-zone !important;
+    justify-self: end !important;
+  }
+
+  .site-header--center-logo #shopify-section-{{ section.id }} .header__logo,
+  .site-header--center-logo #shopify-section-{{ section.id }} .header__logo img {
+    max-width: min(var(--logo-width), 160px) !important;
+  }
+
+  .site-header--right-menu {
+    grid-template-columns: auto 1fr auto !important;
+    grid-template-areas: "logo-zone right-zone burger-zone" !important;
+  }
+
+  .site-header--right-menu .header__title {
+    justify-self: start !important;
   }
 
   .header__burger-btn {
-    display: flex;
+    display: flex !important;
   }
 
-  .header__menu { display: none !important; }
+  .header__menu {
+    display: none !important;
+  }
+
+  #shopify-section-{{ section.id }} .header__logo,
+  #shopify-section-{{ section.id }} .header__logo.image,
+  #shopify-section-{{ section.id }} .header__logo img {
+    max-width: min(var(--logo-width), 140px) !important;
+  }
 }
 {% endstyle %}
 
@@ -742,26 +923,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const moreBtn = container.querySelector('[data-menu-more]');
   const dropdown = container.querySelector('[data-menu-dropdown]');
+  
   const allItems = Array.from(container.querySelectorAll('[data-menu-item]'));
 
   const updateMenu = () => {
     if (moreBtn.open) moreBtn.open = false;
 
-    dropdown.innerHTML = ""; 
+    allItems.forEach(item => {
+      container.insertBefore(item, moreBtn);
+    });
 
-    allItems.forEach(item => container.insertBefore(item, moreBtn));
+    moreBtn.dataset.state = "hidden";
 
-    let itemsInMenu = [...allItems];
-
-    while (container.scrollWidth > container.clientWidth && itemsInMenu.length > 0) {
-      const lastItem = itemsInMenu.pop();
-      dropdown.prepend(lastItem);
+    let i = allItems.length - 1;
+    while (container.scrollWidth > container.clientWidth && i >= 0) {
+      dropdown.prepend(allItems[i]);
+      moreBtn.dataset.state = "visible"; 
+      i--;
     }
 
-    const hasOverflow = dropdown.children.length > 0;
-    moreBtn.dataset.state = hasOverflow ? "visible" : "hidden";
-
-    container.dataset.overflow = hasOverflow.toString();
+    container.dataset.overflow = (dropdown.children.length > 0).toString();
   };
 
   const observer = new ResizeObserver(() => {
@@ -789,17 +970,34 @@ document.addEventListener('DOMContentLoaded', () => {
       "label": "Logo Image"
     },
     {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 100,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
       "type": "text",
       "id": "logo_text",
       "label": "Logo Text",
       "info": "Optional text placed alongside logo image, or used as main logo if image is empty."
     },
     {
+      "type": "font_picker",
+      "id": "logo_font",
+      "label": "Logo Font Override",
+      "info": "Select a custom font for your text logo.",
+      "default": "assistant_n4"
+    },
+    {
       "type": "range",
       "id": "logo_text_size",
       "label": "Text Size",
       "min": 14,
-      "max": 36,
+      "max": 48,
       "step": 1,
       "unit": "px",
       "default": 22
@@ -859,6 +1057,58 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       "type": "header",
+      "content": "Colors & Background"
+    },
+    {
+      "type": "select",
+      "id": "color_mode",
+      "label": "Background source",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Header background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Header text color",
+      "default": "#000000"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Header background image"
+    },
+    {
+      "type": "select",
+      "id": "bg_position",
+      "label": "Image focal point (position)",
+      "options": [
+        { "value": "top center", "label": "Top" },
+        { "value": "center center", "label": "Center" },
+        { "value": "bottom center", "label": "Bottom" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "select",
+      "id": "bg_size",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover", "label": "Fill header (Cover)" },
+        { "value": "contain", "label": "Fit inside (Contain)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
       "content": "Icons & Appearance"
     },
     {
@@ -910,11 +1160,17 @@ document.addEventListener('DOMContentLoaded', () => {
       "name": "Header",
       "settings": {
         "header_layout": "left-logo",
+        "logo_width": 180,
         "logo_text": "",
         "logo_text_size": 22,
         "logo_text_weight": "800",
         "logo_text_transform": "uppercase",
         "logo_text_spacing": 1,
+        "color_mode": "theme",
+        "bg_color": "#ffffff",
+        "text_color": "#000000",
+        "bg_position": "center center",
+        "bg_size": "cover",
         "icon_size": 24,
         "sticky_header": true,
         "show_wishlist": true,
